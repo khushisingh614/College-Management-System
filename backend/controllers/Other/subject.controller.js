@@ -20,10 +20,35 @@ const getSubject = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
+const getSUbjectbranchandsem = async (req, res) => {
+    try {
+        const { offering_branch, semester } = req.query; // Extract query parameters
+        
+        let query = {}; // Default: Empty query to fetch all subjects
+
+        // If branch and semester are provided, filter based on them
+        if (offering_branch && semester) {
+            query = { offering_branch, semester };
+        }
+
+        
+        // Fetch subjects based on query
+        const subjects = await Subject.find(query);
+
+        if (!subjects || subjects.length === 0) {
+            return res.json({ success: false, message: "No subjects found" });
+        }
+
+        res.json({ success: true, message: "Subjects Loaded!", subject: subjects });
+
+    } catch (error) {
+        console.error(error.message);
+        res.json({ success: false, message: "Internal Server Error" });
+    }
+};
 
 const addSubject = async (req, res) => {
-    console.log(req.body);
-    let { name, code, offering_branch } = req.body;
+    let { name, code, offering_branch , semester } = req.body;
     try {
         let subject = await Subject.findOne({ code });
         if (subject) {
@@ -35,6 +60,7 @@ const addSubject = async (req, res) => {
             name,
             code,
             offering_branch,
+            semester,
         });
         const data = {
             success: true,
@@ -68,4 +94,4 @@ const deleteSubject = async (req, res) => {
     }
 }
 
-module.exports = { getSubject, addSubject, deleteSubject }
+module.exports = { getSubject, getSUbjectbranchandsem, addSubject, deleteSubject }

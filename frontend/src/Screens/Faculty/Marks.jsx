@@ -97,10 +97,13 @@ const Marks = () => {
       });
   };
 
-  const getSubjectData = () => {
+  const getSubjectData = (branch, semester) => {
+    if (!branch || !semester) return;
     toast.loading("Loading Subjects");
     axios
-      .get(`${baseApiURL()}/subject/getSubject`)
+      .get(`${baseApiURL()}/subject/getSubjectbranchandsem`, {
+        params: { offering_branch: selected.branch, semester: selected.semester }, 
+      })
       .then((response) => {
         toast.dismiss();
         if (response.data.success) {
@@ -117,8 +120,13 @@ const Marks = () => {
 
   useEffect(() => {
     getBranchData();
-    getSubjectData();
-  }, []);
+  }, []);  // Fetch branches only once on mount
+  
+  useEffect(() => {
+    if (selected.branch && selected.semester) {
+      getSubjectData(selected.branch, selected.semester);
+    }
+  }, [selected.branch, selected.semester]); // Run whenever branch or semester changes
 
   const resetValueHandler = () => {
     setStudentData();
