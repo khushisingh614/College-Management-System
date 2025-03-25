@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const path = require("path")
 connectToMongo();
-const port = 5000 || process.env.PORT;
+const port = 5001 || process.env.PORT;
 var cors = require("cors");
 
 app.use(cors({
@@ -34,6 +34,13 @@ app.use("/api/notice", require("./routes/Other Api/notice.route"));
 app.use("/api/subject", require("./routes/Other Api/subject.route"));
 app.use("/api/marks", require("./routes/Other Api/marks.route"));
 app.use("/api/branch", require("./routes/Other Api/branch.route"));
+
+// Feedback Apis for admin
+app.use("/api/admin", require("./routes/Admin Api/feedback.route"));
+
+// Feedback Apis for student
+app.use("/api/student", require("./routes/Student Api/feedback.route"));
+
 
 app.listen(port, () => {
   console.log(`Server Listening On http://localhost:${port}`);
