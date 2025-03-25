@@ -2,18 +2,20 @@ const Feedback = require('../../models/Students/Feedback.model.js');
 
 const createFeedback = async (req, res) => {
     try {
-        const { adminId, professorId, semester, subject } = await Feedback.find(req.body);
-        if (!adminId || !professorId || !semester || !subject) {
+        const { adminId, professorId, semester, subject, questions } = req.body;
+        if (!adminId || !professorId || !semester || !subject || !questions) {
             return res
                 .status(400)
                 .json({ success: false, message: "All Fields are required." });
         }
-
+        
         const feedback = await Feedback.create({
             adminId: adminId,
             professorId: professorId,
-            semester: semester,
+            semester: parseInt(semester) || 0,
             subject: subject,
+            questions: questions,
+            feedbackData: []
         });
 
         if (!feedback) {
@@ -21,6 +23,7 @@ const createFeedback = async (req, res) => {
         }
         res.status(200).json({ success: true, message: "Feedback created successfully!" });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ success: false, message: "Internal Server Error while creating the feedback." });
     }
 }

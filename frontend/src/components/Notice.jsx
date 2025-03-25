@@ -220,6 +220,7 @@ const Notice = () => {
                       <span className="text-sm bg-blue-500 px-4 py-1 text-white rounded-full">
                         {item.type}
                       </span>
+                      
                       <span
                         className="text-2xl group-hover:text-blue-500 ml-2 cursor-pointer hover:text-red-500"
                         onClick={() => deleteNoticehandler(item._id)}

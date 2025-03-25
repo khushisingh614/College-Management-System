@@ -2,8 +2,8 @@ const Feedback =  require('../../models/Students/Feedback.model.js');
 
 const submitFeedback = async (req, res) => {
     try {
-        const { feedbackId, studentId, ratings, comments } = await Feedback.find(req.body);
-        if (!feedbackId || !studentId || !ratings) {
+        const { feedbackId, studentId, responses } = await Feedback.find(req.body);
+        if (!feedbackId || !studentId || !responses) {
             return res
                 .status(400)
                 .json({ success: false, message: "All Fields are required." });
@@ -12,11 +12,12 @@ const submitFeedback = async (req, res) => {
         if (!feedback) {
             return res.status(400).json({ success: false, message: "Feedback not found." });
         }
-        await feedback.feedbackData.push({
+        if(!responses || responses.length !== feedback.questions.length) {
+            return res.status(400).json({ success: false, message: "All questions are required." });
+        }
+        feedback.feedbackData.push({
             studentId: studentId,
-            ratings: ratings,
-            comments: comments.trim(),
-            createdAt: Date.now()
+            responses: responses,
         });
         await feedback.save();
         res.status(200).json({ success: true, message: "Feedback submitted successfully!" });

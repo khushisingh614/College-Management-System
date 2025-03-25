@@ -36,10 +36,10 @@ app.use("/api/marks", require("./routes/Other Api/marks.route"));
 app.use("/api/branch", require("./routes/Other Api/branch.route"));
 
 // Feedback Apis for admin
-app.use("/api/admin", require("./routes/Admin Api/feedback.route"));
+app.use("/api/admin/feedback", require("./routes/Admin Api/feedback.route"));
 
 // Feedback Apis for student
-app.use("/api/student", require("./routes/Student Api/feedback.route"));
+app.use("/api/student/feedback", require("./routes/Student Api/feedback.route"));
 
 
 app.listen(port, () => {

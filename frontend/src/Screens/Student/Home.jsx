@@ -7,6 +7,7 @@ import Notice from "../../components/Notice";
 import Material from "./Material";
 import { Toaster } from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
+import StudentDashboard from "./StudentDashboard";
 const Home = () => {
   const [selectedMenu, setSelectedMenu] = useState("My Profile");
   const router = useLocation();
@@ -75,12 +76,23 @@ const Home = () => {
               >
                 Notice
               </li>
+              <li
+                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
+                  selectedMenu === "StudentDashboard"
+                    ? "border-b-2 pb-2 border-blue-500 bg-blue-100 rounded-sm"
+                    : "bg-blue-500 text-white hover:bg-blue-600 border-b-2 border-blue-500"
+                }`}
+                onClick={() => setSelectedMenu("StudentDashboard")}
+              >
+                StudentDashboard
+              </li>
             </ul>
             {selectedMenu === "Timetable" && <Timetable />}
             {selectedMenu === "Marks" && <Marks />}
             {selectedMenu === "Material" && <Material />}
             {selectedMenu === "Notice" && <Notice />}
             {selectedMenu === "My Profile" && <Profile />}
+            {selectedMenu === "StudentDashboard" && <StudentDashboard />}
           </div>
         </>
       )}

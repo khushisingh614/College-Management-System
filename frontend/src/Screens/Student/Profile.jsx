@@ -7,8 +7,6 @@ import { baseApiURL } from "../../baseUrl";
 import toast from "react-hot-toast";
 const Profile = () => {
   const [showPass, setShowPass] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [shownewPassword, setShownewPassword] = useState(false);
   const router = useLocation();
   const [data, setData] = useState();
   const dispatch = useDispatch();
@@ -16,6 +14,86 @@ const Profile = () => {
     new: "",
     current: "",
   });
+
+const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+useEffect(() => {
+  const handleOnline = () => setIsOnline(true);
+  const handleOffline = () => setIsOnline(false);
+
+  window.addEventListener("online", handleOnline);
+  window.addEventListener("offline", handleOffline);
+
+  return () => {
+    window.removeEventListener("online", handleOnline);
+    window.removeEventListener("offline", handleOffline);
+  };
+}, []);
+
+useEffect(() => {
+  if (isOnline) {
+    syncOfflineChanges();
+  }
+}, [isOnline]);
+
+const syncOfflineChanges = async () => {
+  let pendingChanges = JSON.parse(localStorage.getItem("offlinePasswords")) || [];
+
+  if (pendingChanges.length === 0) {
+    console.log("No offline password changes to sync."); // ✅ Debugging
+    return;
+  }
+
+  console.log("Syncing offline password changes:", pendingChanges); // ✅ Debugging
+
+  for (const change of pendingChanges) {
+    try {
+      let userId = change.id; // Use stored ID if available
+
+      // 🔍 If ID is missing, fetch the user ID first
+      if (!userId) {
+        console.log(`Fetching user ID for login ID: ${change.loginid}`);
+        const loginResponse = await axios.post(
+          `${baseApiURL()}/student/auth/login`,
+          { loginid: change.loginid, password: change.currentPassword },
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        if (loginResponse.data.success) {
+          userId = loginResponse.data.id; // ✅ Get correct ID from backend
+          console.log(`Fetched user ID: ${userId}`);
+        } else {
+          console.error(`Failed to get user ID: ${loginResponse.data.message}`);
+          toast.error(`Failed to sync password for ${change.loginid}.`);
+          continue; // Skip this change
+        }
+      }
+
+      // 🔄 Now, update the password using the correct ID
+      console.log(`Syncing password change for user ID: ${userId}`);
+
+      const updateResponse = await axios.put(
+        `${baseApiURL()}/student/auth/update/${userId}`,
+        { password: change.newPassword },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      if (updateResponse.data.success) {
+        toast.success(`Password for ${change.loginid} synced successfully!`);
+      } else {
+        toast.error(`Failed to sync password for ${change.loginid}.`);
+      }
+    } catch (error) {
+      console.error(`Error syncing password for ${change.loginid}:`, error);
+      toast.error(`Failed to sync password for ${change.loginid}.`);
+    }
+  }
+
+  // ✅ Clear stored changes after syncing
+  localStorage.removeItem("offlinePasswords");
+  console.log("Cleared offline password changes after sync."); // ✅ Debugging
+};
+
   useEffect(() => {
     const headers = {
       "Content-Type": "application/json",
@@ -48,36 +126,102 @@ const Profile = () => {
       });
   }, [dispatch, router.state.loginid, router.state.type]);
 
-  const checkPasswordHandler = (e) => {
+  //  const checkPasswordHandler = (e) => { 
+  //   e.preventDefault();
+  //   const headers = {
+  //     "Content-Type": "application/json",
+  //   };
+  //   axios
+  //     .post(
+  //       `${baseApiURL()}/student/auth/login`,
+  //       { loginid: router.state.loginid, password: password.current },
+  //       {
+  //         headers: headers,
+  //       }
+  //     )
+  //     .then((response) => {
+  //       if (response.data.success) {
+  //         changePasswordHandler(response.data.id);
+  //       } else {
+  //         toast.error(response.data.message);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       toast.error(error.response.data.message);
+  //       console.error(error);
+  //     });
+  // };
+  const checkPasswordHandler = async (e) => {
     e.preventDefault();
-    const headers = {
-      "Content-Type": "application/json",
-    };
-    axios
-      .post(
-        `${baseApiURL()}/student/auth/login`,
-        { loginid: router.state.loginid, password: password.current },
-        {
-          headers: headers,
-        }
-      )
-      .then((response) => {
+  
+    if (!password.current || !password.new) {
+      toast.error("Please enter both current and new password.");
+      return;
+    }
+  
+    if (isOnline) {
+      // User is online, proceed with API request
+      try {
+        const response = await axios.post(
+          `${baseApiURL()}/student/auth/login`,
+          { loginid: router.state.loginid, password: password.current },
+          { headers: { "Content-Type": "application/json" } }
+        );
+  
         if (response.data.success) {
           changePasswordHandler(response.data.id);
         } else {
           toast.error(response.data.message);
         }
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Login failed.");
         console.error(error);
+      }
+    } else {
+      // User is offline, save the request for later
+      saveOfflinePasswordChange({
+        loginid: router.state.loginid,
+        newPassword: password.new,
+        currentPassword: password.current,
       });
+  
+      toast.success("You're offline! Password change will sync when online.");
+      setPassword({ new: "", current: "" });
+    }
   };
+  
+  const saveOfflinePasswordChange = (passwordData) => {
+    let pendingChanges = JSON.parse(localStorage.getItem("offlinePasswords")) || [];
+  
+    // Make sure we store the correct ID (if available)
+    const changeWithId = {
+      id: passwordData.id || null, // Store ID if available
+      loginid: passwordData.loginid,
+      newPassword: passwordData.newPassword,
+      currentPassword: passwordData.currentPassword,
+    };
+  
+    pendingChanges.push(changeWithId);
+    localStorage.setItem("offlinePasswords", JSON.stringify(pendingChanges));
+  
+    console.log("Saved offline password changes:", pendingChanges); // ✅ Debugging
+  };
+  
+
+  //...
+
+ 
+ 
+  
+  
+ 
+      
 
   const changePasswordHandler = (id) => {
     const headers = {
       "Content-Type": "application/json",
     };
+    console.log("id", id);
     axios
       .put(
         `${baseApiURL()}/student/auth/update/${id}`,
@@ -136,43 +280,24 @@ const Profile = () => {
                 className="mt-4 border-t-2 border-blue-500 flex flex-col justify-center items-start"
                 onSubmit={checkPasswordHandler}
               >
-                <div className="flex flex-col w-[70%] mt-3 relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password.current}
-                    onChange={(e) =>
-                      setPassword({ ...password, current: e.target.value })
-                    }
-                    placeholder="Current Password"
-                    className="px-3 py-1 border-2 border-blue-500 outline-none rounded mt-4 pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-600 mt-4"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
-
-                <div className="flex flex-col w-[70%] mt-3 relative">
-                  <input
-                    type={shownewPassword ? "text" : "password"}
-                    value={password.new}
-                    onChange={(e) =>
-                      setPassword({ ...password, new: e.target.value })
-                    }
-                    placeholder="New Password"
-                    className="px-3 py-1 border-2 border-blue-500 outline-none rounded mt-4"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-600 mt-4"
-                    onClick={() => setShownewPassword(!shownewPassword)}
-                  >
-                    {shownewPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
+                <input
+                  type="password"
+                  value={password.current}
+                  onChange={(e) =>
+                    setPassword({ ...password, current: e.target.value })
+                  }
+                  placeholder="Current Password"
+                  className="px-3 py-1 border-2 border-blue-500 outline-none rounded mt-4"
+                />
+                <input
+                  type="password"
+                  value={password.new}
+                  onChange={(e) =>
+                    setPassword({ ...password, new: e.target.value })
+                  }
+                  placeholder="New Password"
+                  className="px-3 py-1 border-2 border-blue-500 outline-none rounded mt-4"
+                />
                 <button
                   className="mt-4 hover:border-b-2 hover:border-blue-500"
                   onClick={checkPasswordHandler}
@@ -195,3 +320,5 @@ const Profile = () => {
 };
 
 export default Profile;
+
+
