@@ -1,5 +1,14 @@
 const studentDetails = require("../../models/Students/details.model.js")
+const nodemailer = require("nodemailer");
 
+// Configure Nodemailer
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER, // Sender email
+    pass: process.env.EMAIL_PASS, // App password
+  },
+});
 const getDetails = async (req, res) => {
     try {
         let user = await studentDetails.find(req.body);
@@ -32,6 +41,25 @@ const addDetails = async (req, res) => {
             });
         }
         user = await studentDetails.create({ ...req.body, profile: req.file.filename });
+        // Send OTP via email
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: req.body.email, // Ensure email exists in user model
+            subject: "Your Login Credentials",
+            text: `Hello ${req.body.firstName} ${req.body.middleName} ${req.body.lastName},\n\nYour account has been created successfully!\n\nHere are your login credentials:\n\nLogin ID: ${req.body.enrollmentNo}\nPassword: ${req.body.enrollmentNo}\n\nPlease change your password after logging in for security reasons.\n\nBest Regards,\nAdmin`,
+        };
+
+        transporter.sendMail(mailOptions, (error) => {
+            if (error) {
+                console.log(error);
+                return res.status(500).json({ success: false, message: "Error sending Mail to Student" });
+            }
+            res.json({
+                success: true,
+                message: "Mail sent to the student email with login credentials",
+                enrollmentNo: req.body.enrollmentNo,
+            });
+        });
         const data = {
             success: true,
             message: "Student Details Added!",
