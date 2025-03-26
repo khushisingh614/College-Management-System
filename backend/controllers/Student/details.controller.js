@@ -107,4 +107,30 @@ const getCount = async (req, res) => {
     }
 }
 
-module.exports = { getDetails, addDetails, updateDetails, deleteDetails, getCount }
+const getStudentsWithSubjectId = async (req, res) => {
+    const { subjectId } = req.params;
+    if(!subjectId) {        
+        return res.status(400).json({ success: false, message: "Subject ID is required" });
+    }
+    try {
+        const students = await studentDetails.find({ subjects: { $in: [subjectId] } });
+        res.json({ success: true, message: "Students Found!", students });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal Server Error", error });
+    }
+}
+
+const addSubjectToStudent = async (req, res) => {
+    const { studentId, subjectId } = req.body;
+    if (!studentId || !subjectId) {
+        return res.status(400).json({ success: false, message: "Student ID and Subject ID are required" });
+    }
+    try {
+        const student = await studentDetails.findByIdAndUpdate(studentId, { $push: { subjects: subjectId } }, { new: true });
+        res.json({ success: true, message: "Subject Added to Student", student });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal Server Error", error });
+    }
+}
+
+module.exports = { getDetails, addDetails, updateDetails, deleteDetails, getCount, getStudentsWithSubjectId, addSubjectToStudent }

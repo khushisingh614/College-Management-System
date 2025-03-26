@@ -16,7 +16,13 @@ const Subject = new mongoose.Schema({
   semester: {
     type: Number,
     required: true,
-  }
+  },
+  students: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student Detail"
+    }
+  ]
 
 }, { timestamps: true });
 
