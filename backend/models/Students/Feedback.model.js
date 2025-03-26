@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const feedbackSchema = new mongoose.Schema({
     adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin Detail', required: true },
     questions: [{ type: String, required: true }],
-    professorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Faculty Detail', required: true },
+    professorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Faculty Detail', required: true }, //yha pr professor ka object id jo mongo m hota hai userka diya hua nhi to frnted m professor ka list fetch krna hoga aur ui p name show hoga aur jb request jaye wha se to wo object id pass kiya jayega ._id wla...bss
     semester: { type: Number, required: true },
     subject: { type: String, required: true },
     feedbackData: [

@@ -1,30 +1,30 @@
 const Feedback =  require('../../models/Students/Feedback.model.js');
 
-const submitFeedback = async (req, res) => {
-    try {
-        const { feedbackId, studentId, responses } = await Feedback.find(req.body);
-        if (!feedbackId || !studentId || !responses) {
-            return res
-                .status(400)
-                .json({ success: false, message: "All Fields are required." });
-        }
-        const feedback = await Feedback.findById(feedbackId);
-        if (!feedback) {
-            return res.status(400).json({ success: false, message: "Feedback not found." });
-        }
-        if(!responses || responses.length !== feedback.questions.length) {
-            return res.status(400).json({ success: false, message: "All questions are required." });
-        }
-        feedback.feedbackData.push({
-            studentId: studentId,
-            responses: responses,
-        });
-        await feedback.save();
-        res.status(200).json({ success: true, message: "Feedback submitted successfully!" });
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Internal Server Error while submitting the feedback." });
-    }
-}
+// const submitFeedback = async (req, res) => {
+//     try {
+//         const { feedbackId, studentId, responses } = req.body;
+//         if (!feedbackId || !studentId || !responses) {
+//             return res
+//                 .status(400)
+//                 .json({ success: false, message: "All Fields are required." });
+//         }
+//         const feedback = await Feedback.findById(feedbackId);
+//         if (!feedback) {
+//             return res.status(400).json({ success: false, message: "Feedback not found." });
+//         }
+//         if(!responses || responses.length !== feedback.questions.length) {
+//             return res.status(400).json({ success: false, message: "All questions are required." });
+//         }
+//         feedback.feedbackData.push({
+//             studentId: studentId,
+//             responses: responses,
+//         });
+//         await feedback.save();
+//         res.status(200).json({ success: true, message: "Feedback submitted successfully!" });
+//     } catch (error) {
+//         res.status(500).json({ success: false, message: "Internal Server Error while submitting the feedback." });
+//     }
+// }
 
 
 const getAllFeedback = async (req, res) => {
@@ -84,4 +84,50 @@ const getFeedbackById = async (req, res) => {
     }
 }
 
+const submitFeedback = async (req, res) => {
+    try {
+        const { feedbackId, studentId, responses } = req.body;
+
+        if (!feedbackId || !studentId || !responses || !Array.isArray(responses)) {
+            return res.status(400).json({ success: false, message: "All Fields are required." });
+        }
+
+        const feedback = await Feedback.findById(feedbackId);
+        if (!feedback) {
+            return res.status(404).json({ success: false, message: "Feedback not found." });
+        }
+
+        if (responses.length !== feedback.questions.length) {
+            return res.status(400).json({ success: false, message: "All questions must be answered." });
+        }
+
+        // Check if student has already submitted feedback
+        const alreadySubmitted = feedback.feedbackData.some(data => data.studentId.toString() === studentId);
+        if (alreadySubmitted) {
+            return res.status(400).json({ success: false, message: "Feedback already submitted by this student." });
+        }
+
+        // Push the new feedback response
+        feedback.feedbackData.push({
+            studentId,
+            responses: responses.map(resp => ({
+                ratings: resp.ratings,
+                comments: resp.comments || "",
+                createdAt: new Date()
+            }))
+        });
+
+        await feedback.save();
+
+        res.status(200).json({ success: true, message: "Feedback submitted successfully!" });
+    } catch (error) {
+        console.error("Submit Feedback Error:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error while submitting the feedback." });
+    }
+};
+
+
 module.exports = { submitFeedback, getAllFeedback, getFeedbackById };
+
+
+// module.exports = { submitFeedback };

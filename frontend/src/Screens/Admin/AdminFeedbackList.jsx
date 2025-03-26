@@ -6,7 +6,7 @@ const AdminFeedbackList = ({ adminId }) => {
     const [feedbacks, setFeedbacks] = useState([]);
 
     useEffect(() => {
-        axios.get(`http://localhost:5001/api/feedback/getAll/${adminId}`)
+        axios.get(`http://localhost:5001/api/feedback/all/${adminId}`)
             .then(response => setFeedbacks(response.data))
             .catch(error => console.log(error));
     }, [adminId]);

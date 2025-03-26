@@ -3,6 +3,7 @@ const Feedback = require('../../models/Students/Feedback.model.js');
 const createFeedback = async (req, res) => {
     try {
         const { adminId, professorId, semester, subject, questions } = req.body;
+        // console.log(adminId, professorId, semester, subject, questions)
         if (!adminId || !professorId || !semester || !subject || !questions) {
             return res
                 .status(400)
