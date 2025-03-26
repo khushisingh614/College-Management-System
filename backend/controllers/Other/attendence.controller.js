@@ -1,4 +1,4 @@
-const Attendance = require("../../models/Other/attendence.model.js");
+const Attendance = require("../../models/Other/attendance.model.js");
 const Student = require("../../models/Students/details.model.js");
 const mongoose = require("mongoose");
 
