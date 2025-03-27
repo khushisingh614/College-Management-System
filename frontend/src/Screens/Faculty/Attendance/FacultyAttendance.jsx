@@ -10,12 +10,30 @@ const FacultyAttendance = () => {
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState({});
   const [loading, setLoading] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   const facultyId = useSelector((state) => state.userData?._id) || "";
 
   useEffect(() => {
     if (facultyId) fetchSubjects();
   }, [facultyId]);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isOnline) syncOfflineAttendance();
+  }, [isOnline]);
 
   const fetchSubjects = async () => {
     try {
@@ -33,25 +51,27 @@ const FacultyAttendance = () => {
 
   const fetchStudents = async (subjectId) => {
     if (!subjectId) {
-      setStudents([]); // ✅ Clear previous student data if no subject is selected
+      setStudents([]);
       setAttendance({});
       return;
     }
 
     try {
       setLoading(true);
-      const response = await axios.get(`${baseApiURL()}/student/details/getStudentsBySubject/${subjectId}`);
+      const response = await axios.get(
+        `${baseApiURL()}/student/details/getStudentsBySubject/${subjectId}`
+      );
 
       if (response.data.success && response.data.students.length > 0) {
         setStudents(response.data.students);
         setAttendance(
           response.data.students.reduce((acc, student) => {
-            acc[student._id] = "none"; // ✅ Default to "none"
+            acc[student._id] = "none";
             return acc;
           }, {})
         );
       } else {
-        setStudents([]); // ✅ Clear previous student data
+        setStudents([]);
         setAttendance({});
         toast.error("No students found for this subject");
       }
@@ -64,38 +84,74 @@ const FacultyAttendance = () => {
   };
 
   const markAttendance = async (studentId, newStatus) => {
-    const prevStatus = attendance[studentId]; // ✅ Save previous state
-
-    // ✅ Update UI optimistically
+    const prevStatus = attendance[studentId];
     setAttendance((prev) => ({ ...prev, [studentId]: newStatus }));
 
-    try {
-      const date = new Date().toISOString().split("T")[0]; // Get today's date
-      const attendanceData = {
-        studentId,
-        subjectId: selectedSubject,
-        date,
-        status: newStatus,
-        recordedBy: facultyId,
-      };
+    const date = new Date().toISOString().split("T")[0];
+    const attendanceData = {
+      studentId,
+      subjectId: selectedSubject,
+      date,
+      status: newStatus,
+      recordedBy: facultyId,
+    };
 
-      await axios.post(`${baseApiURL()}/attendance/mark`, { attendanceData });
-
-      toast.success(`Marked ${newStatus} for student.`);
-    } catch (error) {
-      console.error("Error marking attendance:", error);
-      toast.error("Failed to mark attendance");
-
-      // ✅ Revert to the previous state if API call fails
-      setAttendance((prev) => ({ ...prev, [studentId]: prevStatus }));
+    if (isOnline) {
+      try {
+        await axios.post(`${baseApiURL()}/attendance/mark`, { attendanceData });
+        toast.success(`Marked ${newStatus} for student.`);
+      } catch (error) {
+        console.error("Error marking attendance:", error);
+        toast.error("Failed to mark attendance");
+        setAttendance((prev) => ({ ...prev, [studentId]: prevStatus }));
+      }
+    } else {
+      const offlineAttendance =
+        JSON.parse(localStorage.getItem("offlineAttendance")) || [];
+      offlineAttendance.push(attendanceData);
+      localStorage.setItem("offlineAttendance", JSON.stringify(offlineAttendance));
+      toast.success("Attendance saved offline. It will sync when online.");
     }
+  };
+
+  const syncOfflineAttendance = async () => {
+    let pendingAttendance =
+      JSON.parse(localStorage.getItem("offlineAttendance")) || [];
+
+    if (pendingAttendance.length === 0) {
+      console.log("No offline attendance records to sync.");
+      return;
+    }
+
+    console.log("Syncing offline attendance:", pendingAttendance);
+
+    for (const record of pendingAttendance) {
+      try {
+        await axios.post(`${baseApiURL()}/attendance/mark`, { attendanceData: record });
+        toast.success("Offline attendance synced successfully!");
+      } catch (error) {
+        console.error("Error syncing offline attendance:", error);
+        toast.error("Failed to sync some offline attendance records.");
+      }
+    }
+
+    localStorage.removeItem("offlineAttendance");
   };
 
   return (
     <div className="w-[70%] mx-auto mt-10">
       <h2 className="text-2xl font-semibold mb-4">Mark Attendance</h2>
 
-      {/* Subject Selection */}
+      <div className="mb-4">
+        <span
+          className={`p-2 rounded text-white ${
+            isOnline ? "bg-green-500" : "bg-red-500"
+          }`}
+        >
+          {isOnline ? "Online" : "Offline"}
+        </span>
+      </div>
+
       <select
         className="w-full p-2 border rounded"
         value={selectedSubject}
@@ -126,7 +182,9 @@ const FacultyAttendance = () => {
               <div className="flex gap-2">
                 <button
                   className={`px-4 py-2 rounded-lg ${
-                    attendance[student._id] === "present" ? "bg-green-500 text-white" : "bg-gray-300"
+                    attendance[student._id] === "present"
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-300"
                   }`}
                   onClick={() => markAttendance(student._id, "present")}
                 >
@@ -135,7 +193,9 @@ const FacultyAttendance = () => {
 
                 <button
                   className={`px-4 py-2 rounded-lg ${
-                    attendance[student._id] === "absent" ? "bg-red-500 text-white" : "bg-gray-300"
+                    attendance[student._id] === "absent"
+                      ? "bg-red-500 text-white"
+                      : "bg-gray-300"
                   }`}
                   onClick={() => markAttendance(student._id, "absent")}
                 >
