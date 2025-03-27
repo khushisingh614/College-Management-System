@@ -34,8 +34,8 @@ import StudentHome from "./Screens/Student/Home";
 import FacultyHome from "./Screens/Faculty/Home";
 import AdminHome from "./Screens/Admin/Home";
 import SubmitFeedback from "./Screens/Student/SubmitFeedback";
-import AdminFeedbackList from "./Screens/Admin/AdminFeedbackList";
-import AdminFeedbackForm from "./Screens/Admin/AdminFeedbackForm";
+import AdminFeedbackList from "./Screens/Admin/Feedback/AdminFeedbackList";
+import AdminFeedbackForm from "./Screens/Admin/Feedback/AdminFeedbackForm";
 
 const App = () => {
   return (

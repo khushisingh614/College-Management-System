@@ -1,8 +1,5 @@
 const mongoose = require("mongoose");
 
-
-
-
 const Subject = new mongoose.Schema({
   name: {
     type: String,
@@ -18,15 +15,8 @@ const Subject = new mongoose.Schema({
   },
   semester: {
     type: Number,
-    // required: true,
-    default: 0
+    required: true,
   },
-  students: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Student Detail"
-    }
-  ]
 
 }, { timestamps: true });
 

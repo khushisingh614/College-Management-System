@@ -1,88 +1,145 @@
-const Attendance = require("../../models/Other/attendance.model.js");
+const Attendance = require("../../models/Other/attendence.model.js");
 const Student = require("../../models/Students/details.model.js");
-const mongoose = require("mongoose");
 
-// Function to send real-time updates via Socket.IO
-const sendRealtimeAttendanceUpdate = (io, studentId, message) => {
-  io.to(studentId.toString()).emit("attendanceUpdate", message);
-};
+const mongoose = require("mongoose");
 
 // Mark Attendance
 const markAttendance = async (req, res) => {
   try {
-    const { studentId, subjectId, date, status, recordedBy } = req.body;
-    const io = req.app.get("socketio");
+    const { studentId, subjectId, date, status, recordedBy } = req.body.attendanceData;
 
-    // Check if attendance already exists for the date
-    const existingRecord = await Attendance.findOne({ studentId, subjectId, date });
-    if (existingRecord) {
-      return res.status(400).json({ error: "Attendance already marked for this date." });
+    // ✅ Validate ObjectIds
+    if (!mongoose.Types.ObjectId.isValid(studentId) ||
+      !mongoose.Types.ObjectId.isValid(subjectId) ||
+      !mongoose.Types.ObjectId.isValid(recordedBy)) {
+      return res.status(400).json({ success: false, message: "Invalid ObjectId format." });
     }
 
+    // ✅ Check if attendance is already marked
+    let existingRecord = await Attendance.findOne({ studentId, subjectId, date });
+
+    if (existingRecord) {
+      // ✅ Toggle attendance status (if already marked)
+      existingRecord.status = existingRecord.status === "present" ? "absent" : "present";
+      await existingRecord.save();
+      return res.status(200).json({ success: true, message: "Attendance toggled successfully", attendance: existingRecord });
+    }
+
+    // ✅ Mark new attendance if not already recorded
     const attendance = new Attendance({ studentId, subjectId, date, status, recordedBy });
     await attendance.save();
 
-    // Send real-time attendance update to the student
-    sendRealtimeAttendanceUpdate(io, studentId, { message: `Attendance marked as ${status}` });
-
-    res.status(201).json({ message: "Attendance marked successfully", attendance });
+    res.status(201).json({ success: true, message: "Attendance marked successfully", attendance });
   } catch (error) {
-    res.status(500).json({ error: "Failed to mark attendance" });
+    console.error("Mark Attendance Error:", error);
+    res.status(500).json({ success: false, message: "Failed to mark attendance." });
   }
 };
 
 // Fetch Attendance for a Student
+
 const getStudentAttendance = async (req, res) => {
   try {
     const { studentId } = req.params;
 
+    // Validate studentId
     if (!mongoose.Types.ObjectId.isValid(studentId)) {
-      return res.status(400).json({ error: "Invalid student ID" });
+      return res.status(400).json({ success: false, message: "Invalid student ID" });
     }
 
+    // Fetch attendance records for the student
     const attendanceRecords = await Attendance.find({ studentId })
-      .populate("subjectId", "name")
+      .populate("subjectId", "name") // Fetch subject details
       .sort({ date: -1 });
+    if (!attendanceRecords.length) {
+      return res.status(404).json({ success: false, message: "No attendance records found" });
+    }
 
-    res.json(attendanceRecords);
+    // Calculate attendance percentage subject-wise
+    const subjectWiseAttendance = {};
+    attendanceRecords.forEach((record) => {
+      const subjectId = record.subjectId._id.toString();
+    
+      if (!subjectWiseAttendance[subjectId]) {
+        subjectWiseAttendance[subjectId] = { present: 0, total: 0, subjectName: record.subjectId.name };
+      }
+
+      subjectWiseAttendance[subjectId].total++;
+      if (record.status === "present") {
+        subjectWiseAttendance[subjectId].present++;
+      }
+    });
+    
+    // Convert into response format
+    const attendanceSummary = Object.keys(subjectWiseAttendance).map((subjectId) => {
+      const data = subjectWiseAttendance[subjectId];
+      return {
+        subjectId,
+        subjectName: data.subjectName,
+        totalClasses: data.total,
+        presentCount: data.present,
+        attendancePercentage: ((data.present / data.total) * 100).toFixed(2),
+      };
+    });
+
+    // Sort by attendance percentage (highest first)
+    attendanceSummary.sort((a, b) => b.attendancePercentage - a.attendancePercentage);
+    
+    res.status(200).json({ success: true, attendanceSummary, message: "Attendance records fetched successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch attendance records" });
+    console.error("Error fetching attendance:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch attendance records" });
   }
 };
 
-// Fetch Subject-wise Attendance
+
 const getSubjectAttendance = async (req, res) => {
   try {
-    const { studentId, subjectId } = req.params;
+    const { subjectId } = req.params;
 
-    const attendanceRecords = await Attendance.find({ studentId, subjectId })
-      .sort({ date: -1 });
+    // Fetch all attendance records for the subject
+    const attendanceRecords = await Attendance.find({ subjectId });
 
-    res.json(attendanceRecords);
+    // Group by studentId
+    const studentAttendance = {};
+    attendanceRecords.forEach((record) => {
+      const { studentId, status } = record;
+
+      if (!studentAttendance[studentId]) {
+        studentAttendance[studentId] = { present: 0, total: 0 };
+      }
+
+      studentAttendance[studentId].total += 1;
+      if (status === "present") {
+        studentAttendance[studentId].present += 1;
+      }
+    });
+
+    // Fetch student details and calculate percentage
+    const students = await Student.find({ _id: { $in: Object.keys(studentAttendance) } }).select("enrollmentNo firstName middleName lastName");
+
+    const formattedData = students.map((student) => {
+      const attendance = studentAttendance[student._id] || { present: 0, total: 1 };
+      const attendancePercentage = (attendance.present / attendance.total) * 100;
+
+      return {
+        studentId: student._id,
+        enrollmentNo: student.enrollmentNo,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        attendancePercentage: attendancePercentage || 0,
+      };
+    });
+
+    formattedData.sort((a, b) => b.attendancePercentage - a.attendancePercentage);
+
+    res.json({ success: true, attendanceRecords: formattedData });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch subject attendance" });
+    console.error("Error fetching attendance:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch attendance." });
   }
 };
 
-const correctAttendance = async (req, res) => {
-    try {
-      const { studentId, subjectId, date, newStatus } = req.body;
-  
-      const attendanceRecord = await Attendance.findOneAndUpdate(
-        { studentId, subjectId, date },
-        { status: newStatus },
-        { new: true }
-      );
-  
-      if (!attendanceRecord) {
-        return res.status(404).json({ error: "Attendance record not found" });
-      }
-  
-      res.json({ message: "Attendance updated", attendance: attendanceRecord });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to update attendance" });
-    }
-  };
-  
 
-module.exports = { markAttendance, getStudentAttendance, getSubjectAttendance, correctAttendance };
+
+module.exports = { markAttendance, getStudentAttendance, getSubjectAttendance };

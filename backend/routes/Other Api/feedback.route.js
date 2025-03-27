@@ -9,14 +9,14 @@ const { submitFeedback,
 
 
 // for student
-router.post("/submit", submitFeedback);
+router.post("/submit/:feedbackId", submitFeedback);
 router.get("/getAll/:studentId", getAllFeedback);
 // router.get("/getById/:feedbackId/:studentId", getFeedbackById);
 
 // for admin
 router.post("/create", createFeedback);
-router.delete("/delete/:id", deleteFeedback);
-router.get("/getAll/:adminId", getAllAdminFeedback);
+router.delete("/delete/:feedbackId", deleteFeedback);
+router.get("/getAllAdmin/:adminId", getAllAdminFeedback);
 
 
 module.exports = router;

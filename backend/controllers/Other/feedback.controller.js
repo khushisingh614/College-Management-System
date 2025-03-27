@@ -33,12 +33,17 @@ const createFeedback = async (req, res) => {
 const getAllAdminFeedback = async (req, res) => {
     try {
         const adminId = req.params.adminId;
-        const feedback = await Feedback.find({ adminId: adminId });
-        if (!feedback) {
-            return res.status(400).json({ success: false, message: "Feedback not found." });
+       
+        if (!adminId) {
+            return res.status(400).json({ success: false, message: "Admin ID is required." });
         }
-        res.status(200).json({ success: true, feedback });
+        const feedbacks = await Feedback.find({ adminId });
+        // if (!feedbacks) {
+        //     return res.status(400).json({ success: false, message: "Feedback not found." });
+        // }
+        res.status(200).json({ success: true, feedbacks });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ success: false, message: "Internal Server Error while fetching the feedback." });
     }
 }
@@ -60,40 +65,55 @@ const deleteFeedback = async (req, res) => {
 const getAllFeedback = async (req, res) => {
     try {
         const studentId = req.params.studentId;
-        const feedbacks = await Feedback.find();
-        if (!feedbacks) {
-            return res.status(400).json({ success: false, message: "Feedback not found." });
+        
+        // Fetch all feedback forms and populate professor & admin details
+        const feedbacks = await Feedback.find()
+            .populate("professorId", "firstName lastName")
+            .populate("adminId", "firstName lastName");
+
+        if (!feedbacks || feedbacks.length === 0) {
+            return res.status(404).json({ success: false, message: "No feedback forms found." });
         }
 
-        let isSubmitted = false;
-        let resultFeedbacks = {};
-
-        feedbacks.forEach(feedback => {
-            if (feedbacks.feedbackData && feedback.feedbackData.length > 0) {
-                feedback.feedbackData.forEach(data => {
-                    if (data.studentId === studentId) {
-                        isSubmitted = true;
-                        resultFeedbacks.isSubmitted = true;
-                        resultFeedbacks = feedback;
-                        delete resultFeedbacks.feedbackData;
-                        resultFeedbacks.feedbackData.ratings = data.ratings;
-                        resultFeedbacks.feedbackData.comments = data.comments;
-                        resultFeedbacks.feedbackData.createdAt = data.createdAt;
-                    } else {
-                        resultFeedbacks.isSubmitted = false;
-                        resultFeedbacks = feedback;
-                        delete resultFeedbacks.feedbackData;
-                        resultFeedbacks.feedbackData = {};
+        // Process feedback forms for the student
+        const feedbackForms = feedbacks.map(feedback => {
+            const studentFeedbackData = feedback.feedbackData?.find(data => data.studentId.toString() === studentId);
+            
+            return {
+                _id: feedback._id,
+                subject: feedback.subject,
+                semester: feedback.semester,
+                isSubmitted: !!studentFeedbackData, // True if student has responded
+                professor: feedback.professorId ? {
+                    firstName: feedback.professorId.firstName,
+                    lastName: feedback.professorId.lastName
+                } : null,
+                questions: feedback.questions || [], // Ensure questions are always sent
+                admin: feedback.adminId ? {
+                    firstName: feedback.adminId.firstName,
+                    lastName: feedback.adminId.lastName
+                } : null,
+                feedbackData: studentFeedbackData
+                    ? {
+                        ratings: studentFeedbackData.ratings,
+                        comments: studentFeedbackData.comments,
+                        createdAt: studentFeedbackData.createdAt,
                     }
-                });
-            }
+                    : null, // If not submitted, keep feedbackData null
+            };
         });
 
-        res.status(200).json({ success: true, resultFeedbacks });
+        res.status(200).json({ 
+            success: true, 
+            feedbackForms 
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Internal Server Error while fetching the feedback." });
+        console.error("Error fetching feedback:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error while fetching feedback." });
     }
-}
+};
+
+
 
 const getFeedbackById = async (req, res) => {
     try {
@@ -116,7 +136,8 @@ const getFeedbackById = async (req, res) => {
 
 const submitFeedback = async (req, res) => {
     try {
-        const { feedbackId, studentId, responses } = req.body;
+        const { feedbackId } = req.params;
+        const { studentId, responses, comments } = req.body;
 
         if (!feedbackId || !studentId || !responses || !Array.isArray(responses)) {
             return res.status(400).json({ success: false, message: "All Fields are required." });
@@ -131,20 +152,18 @@ const submitFeedback = async (req, res) => {
             return res.status(400).json({ success: false, message: "All questions must be answered." });
         }
 
-        // Check if student has already submitted feedback
-        const alreadySubmitted = feedback.feedbackData.some(data => data.studentId.toString() === studentId);
-        if (alreadySubmitted) {
+        // Check if student already submitted feedback
+        const existingFeedback = feedback.feedbackData.find(data => data.studentId.toString() === studentId);
+        if (existingFeedback) {
             return res.status(400).json({ success: false, message: "Feedback already submitted by this student." });
         }
 
-        // Push the new feedback response
+        // Store feedback properly
         feedback.feedbackData.push({
             studentId,
-            responses: responses.map(resp => ({
-                ratings: resp.ratings,
-                comments: resp.comments || "",
-                createdAt: new Date()
-            }))
+            ratings: responses, // Now correctly stored as an array
+            comments: comments || "", // Store comments separately
+            createdAt: new Date()
         });
 
         await feedback.save();
@@ -155,6 +174,7 @@ const submitFeedback = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error while submitting the feedback." });
     }
 };
+
 
 
 module.exports = { createFeedback, getAllAdminFeedback, deleteFeedback, submitFeedback, getAllFeedback, getFeedbackById };

@@ -115,6 +115,7 @@ const syncOfflineChanges = async () => {
               semester: response.data.user[0].semester,
               enrollmentNo: response.data.user[0].enrollmentNo,
               branch: response.data.user[0].branch,
+              _id: response.data.user[0]._id,
             })
           );
         } else {
