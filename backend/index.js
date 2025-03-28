@@ -15,6 +15,8 @@ const port = 5001 || process.env.PORT;
 app.use(cors({
   origin: process.env.FRONTEND_API_LINK
 }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json()); //to convert request data to json
 
@@ -26,7 +28,7 @@ app.get("/", (req, res) => {
 
 
 app.use('/media', express.static(path.join(__dirname, 'media')));
-
+app.use("/media", express.static(path.join(__dirname, "middlewares/media")));
 
 // Credential Apis
 app.use("/api/student/auth", require("./routes/Student Api/credential.route"));
@@ -39,6 +41,10 @@ app.use("/api/admin/details", require("./routes/Admin Api/details.route"));
 // Other Apis
 app.use("/api/timetable", require("./routes/Other Api/timetable.route"));
 app.use("/api/material", require("./routes/Other Api/material.route"));
+
+app.use("/api/assignments", require("./routes/Other Api/assignment.route"));
+app.use("/api/evaluation", require("./routes/Other Api/evaluation.route"));
+
 app.use("/api/notice", require("./routes/Other Api/notice.route"));
 app.use("/api/subject", require("./routes/Other Api/subject.route"));
 app.use("/api/marks", require("./routes/Other Api/marks.route"));
