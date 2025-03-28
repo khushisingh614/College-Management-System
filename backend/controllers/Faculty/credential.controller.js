@@ -52,7 +52,7 @@ const loginHandler = async (req, res) => {
     subject: "Your OTP Code",
     text: `Your OTP code is ${otp}. It expires in 5 minutes.`,
     };
-
+    // used for sending the otp
     transporter.sendMail(mailOptions, (error) => {
     if (error) {
         console.log(error);
@@ -77,7 +77,7 @@ const loginHandler = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
-
+//to verify the sent otp with the recieved otp
 const verifyOtpHandler = async (req, res) => {
   let { loginid, otp } = req.body;
 
@@ -105,14 +105,14 @@ const registerHandler = async (req, res) => {
         message: "User With This LoginId Already Exists",
       });
     }
-
+  // Adding both static and dynamic salt in the passwords for encypting it in database, for increasing security
     const staticSalt = process.env.STATIC_SALT || "mySecretStaticSalt";
     const dynamicSalt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(
       dynamicSalt + password + staticSalt,
       10
     );
-
+   // Adding credentials of the faculty
     user = await facultyCredential.create({
       loginid,
       password: hashedPassword,

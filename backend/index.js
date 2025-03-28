@@ -43,7 +43,7 @@ app.use("/api/timetable", require("./routes/Other Api/timetable.route"));
 app.use("/api/material", require("./routes/Other Api/material.route"));
 
 app.use("/api/assignments", require("./routes/Other Api/assignment.route"));
-app.use("/api/evaluation", require("./routes/Other Api/evaluation.route"));
+// app.use("/api/evaluation", require("./routes/Other Api/evaluation.route"));
 
 app.use("/api/notice", require("./routes/Other Api/notice.route"));
 app.use("/api/subject", require("./routes/Other Api/subject.route"));
