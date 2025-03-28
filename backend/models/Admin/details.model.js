@@ -34,4 +34,4 @@ const adminDetails = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model("Admin Detail", adminDetails);
+module.exports = mongoose.model("Admin Detail", adminDetails, "adminDetails");

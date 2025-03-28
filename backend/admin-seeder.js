@@ -1,6 +1,6 @@
 const adminDetails = require("./models/Admin/details.model.js");
 const adminCredential = require("./models/Admin/credential.model.js");
-const connectToMongo = require("./database/db.js");
+const connectToMongo = require("./Database/db.js");
 const mongoose = require("mongoose");
 
 const seedData = async () => {
@@ -12,7 +12,8 @@ const seedData = async () => {
 
         await adminCredential.create({
             loginid: 123456,
-            password: "admin123"
+            password: "admin123",
+            dynamic_salt: "dynamic_salt"
         });
 
         const adminDetail = {

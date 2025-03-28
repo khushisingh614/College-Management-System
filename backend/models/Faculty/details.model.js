@@ -46,4 +46,4 @@ const facultyDetails = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model("Faculty Detail", facultyDetails);
+module.exports = mongoose.model("Faculty Detail", facultyDetails, "facultyDetails");
