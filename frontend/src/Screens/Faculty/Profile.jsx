@@ -35,6 +35,7 @@ const Profile = () => {
             setUserData({
               fullname: `${response.data.user[0].firstName} ${response.data.user[0].middleName} ${response.data.user[0].lastName}`,
               employeeId: response.data.user[0].employeeId,
+              _id: response.data.user[0]._id,
             })
           );
         } else {

@@ -8,11 +8,13 @@ const Subjects = () => {
   const [data, setData] = useState({
     name: "",
     code: "",
+    semester: "",
     offering_branch: "",
   });
   const [selected, setSelected] = useState("add");
   const [subject, setSubject] = useState();
   const [branch, setBranch] = useState();
+  const [semester, setSemester] = useState();
   useEffect(() => {
     getSubjectHandler();
   }, []);
@@ -136,6 +138,18 @@ const Subjects = () => {
               id="code"
               value={data.code}
               onChange={(e) => setData({ ...data, code: e.target.value })}
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+            />
+          </div>
+          <div className="w-[40%] mb-4">
+            <label htmlFor="semester" className="leading-7 text-sm">
+              Enter  Semester
+            </label>
+            <input
+              type="number"
+              id="semester"
+              value={data.semester}
+              onChange={(e) => setData({ ...data, semester: e.target.value })}
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>

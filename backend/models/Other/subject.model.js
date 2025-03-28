@@ -16,7 +16,7 @@ const Subject = new mongoose.Schema({
   semester: {
     type: Number,
     required: true,
-  }
+  },
 
 }, { timestamps: true });
 

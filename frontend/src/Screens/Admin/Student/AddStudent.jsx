@@ -8,6 +8,8 @@ const AddStudent = () => {
   const [file, setFile] = useState();
   const [branch, setBranch] = useState();
   const [previewImage, setPreviewImage] = useState("");
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [data, setData] = useState({
     enrollmentNo: "",
     firstName: "",
@@ -18,6 +20,7 @@ const AddStudent = () => {
     semester: "",
     branch: "",
     gender: "",
+    subjects: [],
   });
   const getBranchData = () => {
     const headers = {
@@ -41,6 +44,33 @@ const AddStudent = () => {
     getBranchData();
   }, []);
 
+  const getSubjectsData = () => {
+    axios.get(`${baseApiURL()}/subject/getSubject`)
+      .then((response) => {
+        if (response.data.success) {
+          setSubjects(response.data.subject);
+        } else {
+          toast.error(response.data.message);
+        }
+      })
+      .catch((error) => console.error(error));
+  };
+
+  useEffect(() => {
+    getBranchData();
+    getSubjectsData();
+  }, []);
+
+  const handleSubjectChange = (subjectId) => {
+    setSelectedSubjects((prevSelected) => {
+      const updatedSelection = prevSelected.includes(subjectId)
+        ? prevSelected.filter((id) => id !== subjectId)
+        : [...prevSelected, subjectId];
+      setData({ ...data, subjects: updatedSelection });
+      return updatedSelection;
+    });
+  };
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
@@ -51,69 +81,52 @@ const AddStudent = () => {
   const addStudentProfile = (e) => {
     e.preventDefault();
     toast.loading("Adding Student");
-    const headers = {
-      "Content-Type": "multipart/form-data",
-    };
     const formData = new FormData();
-    formData.append("enrollmentNo", data.enrollmentNo);
-    formData.append("firstName", data.firstName);
-    formData.append("middleName", data.middleName);
-    formData.append("lastName", data.lastName);
-    formData.append("email", data.email);
-    formData.append("phoneNumber", data.phoneNumber);
-    formData.append("semester", data.semester);
-    formData.append("branch", data.branch);
-    formData.append("gender", data.gender);
-    formData.append("type", "profile");
+    Object.keys(data).forEach((key) => {
+      if (Array.isArray(data[key])) {
+        data[key].forEach((item) => formData.append(`${key}[]`, item));
+      } else {
+        formData.append(key, data[key]);
+      }
+    });
     formData.append("profile", file);
-    axios
-      .post(`${baseApiURL()}/student/details/addDetails`, formData, {
-        headers: headers,
-      })
-      .then((response) => {
-        toast.dismiss();
-        if (response.data.success) {
-          toast.success(response.data.message);
-          axios
+    axios.post(`${baseApiURL()}/student/details/addDetails`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+    .then((response) => {
+      toast.dismiss();
+      if (response.data.success) {
+        axios
             .post(`${baseApiURL()}/student/auth/register`, {
               loginid: data.enrollmentNo,
               password: data.enrollmentNo,
             })
-            .then((response) => {
-              toast.dismiss();
-              if (response.data.success) {
-                toast.success(response.data.message);
-                setFile();
-                setData({
-                  enrollmentNo: "",
-                  firstName: "",
-                  middleName: "",
-                  lastName: "",
-                  email: "",
-                  phoneNumber: "",
-                  semester: "",
-                  branch: "",
-                  gender: "",
-                  profile: "",
-                });
-                setPreviewImage();
-              } else {
-                toast.error(response.data.message);
-              }
-            })
-            .catch((error) => {
-              toast.dismiss();
-              toast.error(error.response.data.message);
-            });
-        } else {
-          toast.error(response.data.message);
-        }
-      })
-      .catch((error) => {
-        toast.dismiss();
-        toast.error(error.response.data.message);
-      });
+        toast.success(response.data.message);
+        setData({
+          enrollmentNo: "",
+          firstName: "",
+          middleName: "",
+          lastName: "",
+          email: "",
+          phoneNumber: "",
+          semester: "",
+          branch: "",
+          gender: "",
+          subjects: [],
+        });
+        setFile(null);
+        setPreviewImage("");
+        setSelectedSubjects([]);
+      } else {
+        toast.error(response.data.message);
+      }
+    })
+    .catch((error) => {
+      toast.dismiss();
+      toast.error(error.response.data.message);
+    });
   };
+
 
   return (
     <form
@@ -232,6 +245,25 @@ const AddStudent = () => {
             );
           })}
         </select>
+      </div>
+      <div className="w-[40%]">
+        <label htmlFor="subjects" className="leading-7 text-sm">
+          Select Subjects
+        </label>
+        <div className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1">
+          {subjects.map((subject) => (
+            <div key={subject._id} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id={subject._id}
+                value={subject._id}
+                checked={selectedSubjects.includes(subject._id)}
+                onChange={() => handleSubjectChange(subject._id)}
+              />
+              <label htmlFor={subject._id}>{subject.name}</label>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="w-[40%]">
         <label htmlFor="gender" className="leading-7 text-sm ">

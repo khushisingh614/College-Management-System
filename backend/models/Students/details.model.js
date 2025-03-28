@@ -39,7 +39,13 @@ const studentDetails = new mongoose.Schema({
   profile: {
     type: String,
     required: true,
-  }
+  },
+  subjects: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subject",
+    },
+  ],
 }, { timestamps: true });
 
 module.exports = mongoose.model("Student Detail", studentDetails);

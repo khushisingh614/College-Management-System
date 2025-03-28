@@ -31,7 +31,9 @@ const Profile = () => {
               fullname: `${response.data.user[0].firstName} ${response.data.user[0].middleName} ${response.data.user[0].lastName}`,
               semester: response.data.user[0].semester,
               enrollmentNo: response.data.user[0].enrollmentNo,
+              employeeId: response.data.user[0].employeeId,
               branch: response.data.user[0].branch,
+              _id: response.data.user[0]._id,
             })
           );
         } else {
