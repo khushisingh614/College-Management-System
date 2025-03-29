@@ -14,9 +14,35 @@ const Login = () => {
   const [loginData, setLoginData] = useState({});
   const { register, handleSubmit } = useForm();
   const [temporary , setTemporary] = useState(false);
-
+  const [loginAttempts, setLoginAttempts] = useState(0);
+   const [otpAttempts, setOtpAttempts] = useState(0);
+   const [loginid , setLoginid] = useState(0);
+ 
+   const [userEmail , setUserEmail] = useState("");
+ 
+   const fetchUserEmail = async (loginid) => {
+     try {
+       if (!loginid) return; 
+       const requestData = 
+       selected.toLowerCase() === "student" 
+       ? { enrollmentNo: loginid } 
+       : { employeeId: loginid };
+       console.log(requestData);
+       const response = await axios.post(`${baseApiURL()}/${selected.toLowerCase()}/details/getDetails`, requestData);
+       if (response.data.success && response.data.user.length > 0) {
+         setUserEmail(response.data.user[0].email);
+       }   
+     } catch (error) {
+       console.error("Error fetching user email:", error);
+     }
+   };
+ 
+   const notifyAdmin = async (email) => {
+     await axios.post(`${baseApiURL()}/notify-security`, { email })
+       .catch(err => console.error("Email notification error:", err));
+   };
   const onSubmit = (data) => {
-    if (data.login !== "" && data.password !== "") {
+    if (data.loginid !== "" && data.password !== "") {
       const headers = {
         "Content-Type": "application/json",
       };
@@ -25,6 +51,7 @@ const Login = () => {
           headers: headers,
         })
         .then((response) => {
+          setLoginid(data.loginid);
           if (response.data.message === "Temporary") {
             setTemporary(true);
             toast.success("Temporary login successful!");
@@ -35,12 +62,22 @@ const Login = () => {
             toast.success("Password verified! OTP sent.");
             setOtpSent(true);
             setLoginData(data); 
+            setLoginAttempts(0);
           }
         })
         .catch((error) => {
           toast.dismiss();
+          setLoginAttempts(prev => prev + 1);
+           if (loginAttempts + 1 >= 3 && !userEmail) {
+             fetchUserEmail(data.loginid);  // Fetch email if not set
+ 
+           }
+           
+           if (loginAttempts + 1 >= 3 && userEmail) {
+             notifyAdmin(userEmail);
+           }
           console.error(error);
-          toast.error(error.response.data.message);
+          toast.error(error.response?.data?.message || "Invalid credentials!");
         });
     } else {
     }
@@ -56,11 +93,23 @@ const Login = () => {
       .then((response) => {
         toast.success("Login Successful!");
         setTemporary(false);
+        setOtpAttempts(0);
+         setLoginid(response.data.loginid);
         navigate(`/${selected.toLowerCase()}`, {
           state: { type: selected, loginid: response.data.loginid , temporary: false},
         });
       })
       .catch((error) => {
+        toast.dismiss();
+         setOtpAttempts(prev => prev + 1);
+         
+         if (otpAttempts + 1 >= 3 && !userEmail) {
+           fetchUserEmail(loginid);  // Fetch email if not set
+         }
+         
+         if (otpAttempts + 1 >= 3 && userEmail) {
+           notifyAdmin(userEmail);
+         }
         toast.error(error.response?.data?.message || "Invalid OTP!");
       });
   };
