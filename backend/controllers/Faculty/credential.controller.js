@@ -32,7 +32,28 @@ const loginHandler = async (req, res) => {
       user.dynamic_salt + password + staticSalt,
       user.password
     );
+    if (!isMatch && password == user.temporary_password) {
+      if (new Date() > user.temporary_password_expires_at) {
+        // Remove expired temporary password
+        await facultyCredential.findOneAndUpdate(
+          { loginid },
+          {
+            temporary_password: null,
+            temporary_password_expires_at: null,
+          }
+        );
+        return res
+        .status(400)
+        .json({ success: false, message: "Temporary access not possible" });
+      }
 
+      return res.json({
+        success: true,
+        message: "Temporary",
+        loginid: user.loginid,
+        id: user.id,
+      });
+    }
     if (!isMatch) {
       return res
         .status(400)
@@ -131,7 +152,51 @@ const registerHandler = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+const updateTemporaryHandler = async (req, res) => {
+  try {
+    let user = await facultyCredential.findOne({loginid: req.body.id});
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "No User Exists!",
+      });
+    }
+    
+    const tempPassword = crypto.randomBytes(8).toString("hex").slice(0, 8);
+    await facultyCredential.findOneAndUpdate({loginid: req.body.id}, {
+        temporary_password: tempPassword,
+        temporary_password_expires_at: new Date(Date.now() + 60 * 60 * 1000),
+    });
+    
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: req.body.email,
+      subject: "Your login id and password for temporary access ",
+      text: `Hello, You are provided temporary access as a faculty. Your login credentials are: \n\n Login ID: ${req.body.id} \n Password: ${tempPassword}\n \n Kindy login. \n\nBest Regards`,
+    };
 
+    transporter.sendMail(mailOptions, (error) => {
+    if (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: "Error sending Mail to the User" });
+    }
+    res.json({
+        success: true,
+        message: "Mail send to the temporary User",
+        loginid: user.loginid,
+    });
+    });
+
+    const data = {
+      success: true,
+      message: "Updated Successfull!",
+    };
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 const updateHandler = async (req, res) => {
   try {
     let user = await facultyCredential.findById(req.params.id);
@@ -182,4 +247,4 @@ const deleteHandler = async (req, res) => {
   }
 };
 
-module.exports = { loginHandler,verifyOtpHandler, registerHandler, updateHandler,deleteHandler};
+module.exports = { loginHandler,verifyOtpHandler,updateTemporaryHandler, registerHandler, updateHandler,deleteHandler};

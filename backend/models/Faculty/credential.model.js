@@ -13,6 +13,15 @@ const facultyCredential = new mongoose.Schema({
     type: String, 
     required: true 
   },
+  temporary_password: {
+    type: String,
+    default: null,
+  },
+  temporary_password_expires_at: {
+    type: Date,
+    default: null,
+    expires: 3600,
+  }
 }, { timestamps: true });
 
-module.exports = mongoose.model("Faculty Credential", facultyCredential, "facultyCredentials");
+module.exports = mongoose.model("FacultyCredential", facultyCredential);
