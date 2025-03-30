@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import StudentDashboard from "./StudentDashboard";
 import Attendance from "./Attendance";
+import Resources from "./Resources";
 
 import Curriculum from "./Curriculum";
 import Dashboard from "./Dashboard";
@@ -133,12 +134,24 @@ const Home = () => {
               >
                 Assignment
               </li>
+              <li
+                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
+                  selectedMenu === "Resources"
+                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
+                    : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
+                }`}
+                onClick={() => setSelectedMenu("Resources")}
+              >
+                Resources
+              </li>
             </ul>
             {selectedMenu === "Timetable" && <Timetable />}
             {selectedMenu === "Marks" && <Marks />}
             {selectedMenu === "Material" && <Material />}
             {selectedMenu === "Notice" && <Notice />}
             {selectedMenu === "My Profile" && <Profile />}
+            {selectedMenu === "Resources" && <Resources />}
+
 
             {selectedMenu === "StudentDashboard" && <StudentDashboard />}
             {selectedMenu === "Attendance" && <Attendance />}
