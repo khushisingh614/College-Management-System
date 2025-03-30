@@ -4,14 +4,95 @@ import { baseApiURL } from "../../baseUrl";
 import SubmitAssignment from "./SubmitAssignment";
 import { use } from "react";
 
-export default function Dashboard({id}) {
+function Dashboard({id}) {
     const studentId = id;
     const [assignments, setAssignments] = useState([]);
     const [selectedAssignment, setSelectedAssignment] = useState(null);
     const [showUpload, setShowUpload] = useState(false);
     const [showGrades, setShowGrades] = useState(false);
     const [grades, setGrades] = useState(null);
-    //const [button,setButton] = useState("");
+    //Offline storage
+    const indexedDB =
+  window.indexedDB ||
+  window.mozIndexedDB ||
+  window.webkitIndexedDB ||
+  window.msIndexedDB ||
+  window.shimIndexedDB;
+
+if (!indexedDB) {
+  console.log("IndexedDB could not be found in this browser.");
+}
+const dbName = "AssignmentsDatabase";
+const storeName = "assignments";
+
+
+
+const openDB = () => {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName, 3);
+
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+                if (!db.objectStoreNames.contains(storeName)) {
+                    db.createObjectStore(storeName, { keyPath: "_id" });
+                    console.log("Object store 'assignments' created.");
+                }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject("Error opening IndexedDB");
+    });
+};
+
+// Store assignments in IndexedDB
+const saveAssignmentsToDB = async (data) => {
+    if (!data || data.length === 0) return; // Avoid saving empty data
+
+        const db = await openDB();
+        const tx = db.transaction(storeName, "readwrite");
+        const store = tx.objectStore(storeName);
+        
+        data.forEach(assignment => {
+            if (assignment._id) store.put(assignment);
+        });
+
+        return new Promise((resolve) => {
+            tx.oncomplete = () => resolve();
+        });
+};
+
+// Retrieve assignments from IndexedDB
+const getAssignmentsFromDB = async () => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readonly");
+        const store = tx.objectStore(storeName);
+        const request = store.getAll();
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject("Error retrieving assignments");
+    });
+};
+
+const deleteAssignmentsFromDB = async () => {
+    try {
+        const db = await openDB();
+        const tx = db.transaction(storeName, "readwrite"); // Open in readwrite mode
+        const store = tx.objectStore(storeName);
+        
+        await store.clear(); // Clear all stored assignments
+        console.log("Offline assignments deleted from IndexedDB.");
+    } catch (error) {
+        console.error("Error deleting assignments from IndexedDB:", error);
+    }
+};
+
+// Listen for online event and delete IndexedDB data
+useEffect(() => {
+    window.addEventListener("online", deleteAssignmentsFromDB);
+    return () => window.removeEventListener("online", deleteAssignmentsFromDB);
+}, []);
+
    
     const storedSubmissionId = localStorage.getItem("submissionId");  // Retrieve from localStorage
     
@@ -19,8 +100,15 @@ export default function Dashboard({id}) {
     // Fetch assignments on load
     useEffect(() => {
         axios.get(`${baseApiURL()}/assignments`)
-            .then(res => setAssignments(res.data))
-            .catch(err => console.error("Error fetching assignments:", err));
+            .then(res => {
+                setAssignments(res.data);
+                saveAssignmentsToDB(res.data);
+            })
+            .catch(async () => {
+                console.log("Offline! Retrieving from IndexedDB...");
+                const offlineData = await getAssignmentsFromDB();
+                setAssignments(offlineData);
+            });
     }, []);
 
     // Fetch grades when showGrades is true
@@ -148,3 +236,5 @@ export default function Dashboard({id}) {
         </div>
     );
 }
+
+export default Dashboard;
