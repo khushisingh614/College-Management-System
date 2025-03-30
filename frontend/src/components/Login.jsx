@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
 import { FiLogIn } from "react-icons/fi";
+import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { baseApiURL } from "../baseUrl";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
   const [selected, setSelected] = useState("Student");
+  const bgImage =
+    "/clg.jpg";
+    const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [loginData, setLoginData] = useState({});
   const { register, handleSubmit } = useForm();
@@ -79,7 +81,6 @@ const Login = () => {
           console.error(error);
           toast.error(error.response?.data?.message || "Invalid credentials!");
         });
-    } else {
     }
   };
 
@@ -115,16 +116,39 @@ const Login = () => {
   };
 
   return (
-    <div className="bg-white h-[100vh] w-full flex justify-between items-center">
-      <img
-        className="w-[60%] h-[100vh] object-cover"
-        src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        alt=""
-      />
-      <div className="w-[40%] flex justify-center items-start flex-col pl-8">
-        <p className="text-3xl font-semibold pb-2 border-b-2 border-green-500">
-          {selected && selected} Login
-        </p>
+    <div
+      className="bg-cover bg-center min-h-screen items-center justify-between px-12 relative"
+      style={{ backgroundImage: "url('/clgbg.jpg')" }}
+    >
+      <div className="font-semibold text-[35px] text-center mb-4 pt-2 text-black font-Poppins italic">OneStop CollegeApp </div>
+      <div className="absolute top-4 right-8 flex space-x-6">
+        {["Student", "Faculty", "Admin"].map((role) => (
+          <button
+            key={role}
+            className={`text-xl font-semibold transition-all hover:border-b-2 hover:border-green-500 ${
+              selected === role ? "border-b-2 border-green-500 text-green-600" : "text-white"
+            }`}
+            onClick={() => setSelected(role)}
+          >
+            {role}
+          </button>
+        ))}
+      </div>
+      <div className="flex mt-40 ml-4">
+      <div className="w-1/2 grid grid-cols-2 gap-4">
+        <img src='/prof2.jpg' alt="Service 1" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
+        <img src='/lib.jpg' alt="Service 2" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
+        <img src='/class.jpg' alt="Service 3" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
+        <img src='/prof.jpg' alt="Service 4" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
+      </div>
+
+      
+      <div className="w-1/2 flex justify-center">
+        <div className="bg-white px-8 py-6 rounded-xl shadow-xl w-[520px] h-[417px] ml-16">
+        
+          <h1 className="font-semibold text-[45px] text-center mb-10 mt-4 text-black font-greatVibes">
+            {selected} Login
+          </h1>
 
         {!otpSent ? (
         <form
@@ -220,6 +244,8 @@ const Login = () => {
         </button>
       </div>
       <Toaster position="bottom-center" />
+    </div>
+    </div>
     </div>
   );
 };
