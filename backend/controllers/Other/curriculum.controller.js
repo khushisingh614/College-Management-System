@@ -1,4 +1,4 @@
-const Curriculum = require("../../models/Other/Curriculum.model");
+const Curriculum = require("../../models/Other/curriculum.model");
 
 const getCurriculum = async (req, res) => {
     try {
