@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { toast, Toaster } from "react-hot-toast";
 import axios from "axios";
-import Notice from "./Notice";
+import Notice from "../../components/Notice";
 import Student from "./Student";
 import Faculty from "./Faculty";
 import Subjects from "./Subject";
@@ -12,8 +12,6 @@ import { baseApiURL } from "../../baseUrl";
 import Admin from "./Admin";
 import Profile from "./Profile";
 import Branch from "./Branch";
-import AdminDashboard from "./AdminDashboard";
-import Feedback from "./Feedback";
 
 const Home = () => {
   const router = useLocation();
@@ -87,15 +85,14 @@ const Home = () => {
     <>
       {load && (
         <>
-        
           <Navbar />
           <div className="max-w-6xl mx-auto">
             <ul className="flex justify-evenly items-center gap-10 w-full mx-auto my-8">
               <li
-                className={`text-center font-bold rounded-md px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
+                className={`text-center font-bold rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Profile"
                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                    : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
+                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
                 }`}
                 onClick={() => setSelectedMenu("Profile")}
               >
@@ -105,7 +102,7 @@ const Home = () => {
                 className={`text-center font-bold rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Student"
                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                    : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
+                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
                 }`}
                 onClick={() => setSelectedMenu("Student")}
               >
@@ -115,7 +112,7 @@ const Home = () => {
                 className={`text-center font-bold rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Faculty"
                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                    : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
+                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
                 }`}
                 onClick={() => setSelectedMenu("Faculty")}
               >
@@ -125,17 +122,17 @@ const Home = () => {
                 className={`text-center font-bold rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Branch"
                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                    : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
+                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
                 }`}
                 onClick={() => setSelectedMenu("Branch")}
               >
                 Branch
               </li>
               <li
-                className={`text-center font-bold rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
+                className={`text-center  font-bold rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Notice"
                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                    : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
+                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
                 }`}
                 onClick={() => setSelectedMenu("Notice")}
               >
@@ -145,44 +142,21 @@ const Home = () => {
                 className={`text-center font-bold rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Subjects"
                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                    : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
+                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
                 }`}
                 onClick={() => setSelectedMenu("Subjects")}
               >
                 Subjects
               </li>
               <li
-
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Feedback"
-                    ? "border-b-2 pb-2 border-blue-500 bg-blue-100 rounded-sm"
-                    : "bg-blue-500 text-white hover:bg-blue-600 border-b-2 border-blue-500"
-                }`}
-                onClick={() => setSelectedMenu("Feedback")}
-              >
-                Feedbacks
-              </li>
-              <li
-                
-
                 className={`text-center font-bold rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Admin"
                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                    : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
+                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
                 }`}
                 onClick={() => setSelectedMenu("Admin")}
               >
                 Admins
-              </li>
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "AdminDashboard"
-                    ? "border-b-2 pb-2 border-blue-500 bg-blue-100 rounded-sm"
-                    : "bg-blue-500 text-white hover:bg-blue-600 border-b-2 border-blue-500"
-                }`}
-                onClick={() => setSelectedMenu("AdminDashboard")}
-              >
-                AdminDashboard
               </li>
             </ul>
 
@@ -194,14 +168,10 @@ const Home = () => {
               {selectedMenu === "Subjects" && <Subjects />}
               {selectedMenu === "Admin" && <Admin />}
               {selectedMenu === "Profile" && <Profile />}
-              {selectedMenu === "AdminDashboard" && <AdminDashboard />}
-              {selectedMenu === "Feedback" && <Feedback />}
             </>
           </div>
-      </>
-        
+        </>
       )}
-      
       <Toaster position="bottom-center" />
     </>
     </div>

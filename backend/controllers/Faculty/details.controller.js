@@ -1,4 +1,14 @@
 const facultyDetails = require("../../models/Faculty/details.model.js")
+const nodemailer = require("nodemailer");
+
+// Configure Nodemailer
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER, // Sender email
+    pass: process.env.EMAIL_PASS, // App password
+  },
+});
 
 const getDetails = async (req, res) => {
     try {
@@ -20,27 +30,6 @@ const getDetails = async (req, res) => {
     }
 }
 
-const getAll = async (req, res) => {
-    try {
-        let user = await facultyDetails.find();
-        if (!user) {
-            return res
-                .status(400)
-                .json({ success: false, message: "No Faculty Found" , user: []});
-        }
-        const data = {
-            success: true,
-            message: "Faculty Details Found!",
-            user,
-        };
-        res.json(data);
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-}
-
-
 const addDetails = async (req, res) => {
     try {
         let user = await facultyDetails.findOne({ employeeId: req.body.employeeId });
@@ -51,6 +40,28 @@ const addDetails = async (req, res) => {
             });
         }
         user = await facultyDetails.create({ ...req.body, profile: req.file.filename });
+        
+        // Send OTP via email
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: req.body.email, // Ensure email exists in user model
+            subject: "Your Login Credentials",
+            text: `Hello ${req.body.firstName} ${req.body.middleName} ${req.body.lastName},\n\nYour account has been created successfully!\n\nHere are your login credentials:\n\nLogin ID: ${req.body.employeeId}\nPassword: ${req.body.employeeId}\n\nPlease change your password after logging in for security reasons.\n\nBest Regards,\nAdmin`,
+        };
+
+        transporter.sendMail(mailOptions, (error) => {
+            if (error) {
+                console.log(error);
+                return res.status(500).json({ success: false, message: "Error sending Mail to Faculty" });
+            }
+            res.json({
+                success: true,
+                message: "Mail sent to the faculty email with login credentials",
+                enrollmentNo: req.body.employeeId,
+            });
+        });
+
+
         const data = {
             success: true,
             message: "Faculty Details Added!",
@@ -125,4 +136,4 @@ const getCount = async (req, res) => {
     }
 }
 
-module.exports = { getDetails, addDetails, updateDetails, deleteDetails, getCount, getAll }
+module.exports = { getDetails, addDetails, updateDetails, deleteDetails, getCount }

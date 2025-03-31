@@ -3,6 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { baseApiURL } from "../../baseUrl";
 import { useSelector } from "react-redux";
+import Heading from "../../components/Heading";
 
 const StudentAttendance = () => {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
@@ -14,6 +15,7 @@ const StudentAttendance = () => {
   }, [studentId]);
 
   const fetchAttendance = async () => {
+    console.log(1);
     try {
       setLoading(true);
       const response = await axios.get(`${baseApiURL()}/attendance/getAttendanceByStudent/${studentId}`);
@@ -38,7 +40,7 @@ const StudentAttendance = () => {
 
   return (
     <div className="w-[70%] mx-auto mt-10">
-      <h2 className="text-2xl font-semibold mb-4">My Attendance</h2>
+      <Heading title="My Attendance" />
       {loading ? (
         <p className="text-center text-gray-600">Loading attendance records...</p>
       ) : attendanceRecords.length === 0 ? (

@@ -20,6 +20,7 @@ const getSubject = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
+
 const getSUbjectbranchandsem = async (req, res) => {
     try {
         const { offering_branch, semester } = req.query; // Extract query parameters
@@ -46,6 +47,7 @@ const getSUbjectbranchandsem = async (req, res) => {
         res.json({ success: false, message: "Internal Server Error" });
     }
 };
+
 
 const addSubject = async (req, res) => {
     let { name, code, offering_branch , semester } = req.body;

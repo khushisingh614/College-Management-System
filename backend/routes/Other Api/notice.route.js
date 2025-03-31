@@ -1,13 +1,10 @@
 const express = require("express");
-const { createNotice, updateNotice, deleteNotice, getNotices, getNotifications,getAllNotices } = require("../../controllers/Other/notice.controller.js");
-
+const { getNotice, addNotice, updateNotice, deleteNotice } = require("../../controllers/Other/notice.controller");
 const router = express.Router();
 
-router.post("/add", createNotice); // Create notice & notify students
-router.put("/update/:id", updateNotice); // Update notice
-router.delete("/delete/:id", deleteNotice); // Delete notice
-router.get("/getAllNotices/:adminId/:facultyId", getNotices); // Fetch all notices
-router.get("/getAll", getAllNotices); // Fetch all notices for students
-router.get("/notifications/:studentId", getNotifications); // Fetch notifications for a user
+router.get("/getNotice", getNotice);
+router.post("/addNotice", addNotice);
+router.put("/updateNotice/:id", updateNotice);
+router.delete("/deleteNotice/:id", deleteNotice);
 
 module.exports = router;

@@ -18,4 +18,4 @@ const adminCredential = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("AdminCredential", adminCredential, "adminCredentials");
+module.exports = mongoose.model("Admin Credential", adminCredential);

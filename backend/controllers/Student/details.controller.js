@@ -1,6 +1,15 @@
-const { default: mongoose } = require("mongoose");
 const studentDetails = require("../../models/Students/details.model.js")
-const fs = require("fs");
+const nodemailer = require("nodemailer");
+const Subject = require("../../models/Other/subject.model");
+
+// Configure Nodemailer
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER, // Sender email
+    pass: process.env.EMAIL_PASS, // App password
+  },
+});
 
 const getDetails = async (req, res) => {
     try {
@@ -34,19 +43,33 @@ const addDetails = async (req, res) => {
             });
         }
         user = await studentDetails.create({ ...req.body, profile: req.file.filename });
+        // Send OTP via email
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: req.body.email, // Ensure email exists in user model
+            subject: "Your Login Credentials",
+            text: `Hello ${req.body.firstName} ${req.body.middleName} ${req.body.lastName},\n\nYour account has been created successfully!\n\nHere are your login credentials:\n\nLogin ID: ${req.body.enrollmentNo}\nPassword: ${req.body.enrollmentNo}\n\nPlease change your password after logging in for security reasons.\n\nBest Regards,\nAdmin`,
+        };
+
+        transporter.sendMail(mailOptions, (error) => {
+            if (error) {
+                console.log(error);
+                return res.status(500).json({ success: false, message: "Error sending Mail to student" });
+            }
+            res.json({
+                success: true,
+                message: "Mail sent to the student email with login credentials",
+                enrollmentNo: req.body.enrollmentNo,
+            });
+        });
+
+
         const data = {
             success: true,
             message: "Student Details Added!",
             user,
         };
         res.json(data);
-        fs.unlink("./media/" + req.file.filename, (err) => {
-            if (err) {
-                console.error(err)
-                return
-            }
-            console.log("File removed successfully")
-        })
     } catch (error) {
         console.log(error)
         res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -100,6 +123,21 @@ const deleteDetails = async (req, res) => {
     }
 }
 
+const getStudentsBySubject = async (req, res) => {
+    try {
+      const { subjectId } = req.params;
+      let subject = await Subject.findOne({ _id : subjectId });
+ 
+    // Find students who have this subjectId in their subjects array
+    const students = await studentDetails.find({ branch: subject.offering_branch , semester : subject.semester }).select("firstName middleName lastName enrollmentNo");
+
+      res.json({ success: true, students, message: "Students fetched successfully" });
+    } catch (error) {
+      console.error("Error fetching students:", error);
+      res.status(500).json({ success: false, message: "Failed to fetch students." });
+    }
+  };
+
 const getCount = async (req, res) => {
     try {
         let user = await studentDetails.count(req.body);
@@ -116,34 +154,4 @@ const getCount = async (req, res) => {
     }
 }
 
-const getStudentsBySubject = async (req, res) => {
-    try {
-      const { subjectId } = req.params;
- 
-      const subjectObjectId = new mongoose.Types.ObjectId(subjectId);
-
-    // Find students who have this subjectId in their subjects array
-    const students = await studentDetails.find({ subjects: subjectObjectId }).select("firstName middleName lastName enrollmentNo");
-
-      res.json({ success: true, students, message: "Students fetched successfully" });
-    } catch (error) {
-      console.error("Error fetching students:", error);
-      res.status(500).json({ success: false, message: "Failed to fetch students." });
-    }
-  };
-  
-
-const addSubjectToStudent = async (req, res) => {
-    const { studentId, subjectId } = req.body;
-    if (!studentId || !subjectId) {
-        return res.status(400).json({ success: false, message: "Student ID and Subject ID are required" });
-    }
-    try {
-        const student = await studentDetails.findByIdAndUpdate(studentId, { $push: { subjects: subjectId } }, { new: true });
-        res.json({ success: true, message: "Subject Added to Student", student });
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Internal Server Error", error });
-    }
-}
-
-module.exports = { getDetails, addDetails, updateDetails, deleteDetails, getCount, getStudentsBySubject, addSubjectToStudent }
+module.exports = { getDetails,getStudentsBySubject, addDetails, updateDetails, deleteDetails, getCount }

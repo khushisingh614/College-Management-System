@@ -35,8 +35,17 @@ const CurriculumUpload = () => {
       });
   }, []);
 
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      console.log("Selected File:", selectedFile);  // Debugging
+    } else {
+      console.log("No file selected");
+    }
+  };
+
   const addCurriculumHandler = () => {
-    console.log(1);
     if (!selected.subject || !file) {
       toast.error("Please select a subject and upload a file!");
       return;
@@ -46,13 +55,13 @@ const CurriculumUpload = () => {
     const headers = {
       "Content-Type": "multipart/form-data",
     };
+
     const formData = new FormData();
     formData.append("subject", selected.subject);
     formData.append("faculty", selected.faculty);
     formData.append("type", "curriculum");
     formData.append("curriculum", file);
-
-
+    
     axios
       .post(`${baseApiURL()}/curriculum/addCurriculum`, formData, { headers })
       .then((response) => {
@@ -102,7 +111,7 @@ const CurriculumUpload = () => {
             </select>
           </div>
 
-          {!selected.link && (
+          {!file && (
             <label
               htmlFor="upload"
               className="px-2 bg-blue-50 py-3 rounded-sm text-base w-[80%] mt-4 flex justify-center items-center cursor-pointer"
@@ -113,7 +122,7 @@ const CurriculumUpload = () => {
               </span>
             </label>
           )}
-          {selected.link && (
+          {file && (
             <p
               className="px-2 border-2 border-blue-500 py-2 rounded text-base w-[80%] mt-4 flex justify-center items-center cursor-pointer"
               onClick={() => setFile(null)}
@@ -130,7 +139,7 @@ const CurriculumUpload = () => {
             name="upload"
             id="upload"
             hidden
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={handleFileChange}
           />
 
           <button

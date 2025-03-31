@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { baseApiURL } from "../../../baseUrl";
 import { useSelector } from "react-redux";
 
+
 const FacultyAttendance = () => {
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("");
@@ -38,6 +39,7 @@ const FacultyAttendance = () => {
   const fetchSubjects = async () => {
     try {
       const response = await axios.get(`${baseApiURL()}/subject/getSubject`);
+      console.log(response);
       if (response.data.success) {
         setSubjects(response.data.subject);
       } else {

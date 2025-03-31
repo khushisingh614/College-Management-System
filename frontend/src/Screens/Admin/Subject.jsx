@@ -8,13 +8,11 @@ const Subjects = () => {
   const [data, setData] = useState({
     name: "",
     code: "",
-    semester: "",
     offering_branch: "",
   });
   const [selected, setSelected] = useState("add");
   const [subject, setSubject] = useState();
   const [branch, setBranch] = useState();
-  const [semester, setSemester] = useState();
   useEffect(() => {
     getSubjectHandler();
   }, []);
@@ -69,7 +67,7 @@ const Subjects = () => {
         toast.dismiss();
         if (response.data.success) {
           toast.success(response.data.message);
-          setData({ name: "", code: "" , offering_branch: "" });
+          setData({ name: "", code: "" , offering_branch: "", semester: "" });
           getSubjectHandler();
         } else {
           toast.error(response.data.message);
@@ -134,22 +132,10 @@ const Subjects = () => {
               Enter Subject Code
             </label>
             <input
-              type="number"
+              type="text"
               id="code"
               value={data.code}
               onChange={(e) => setData({ ...data, code: e.target.value })}
-              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-            />
-          </div>
-          <div className="w-[40%] mb-4">
-            <label htmlFor="semester" className="leading-7 text-sm">
-              Enter  Semester
-            </label>
-            <input
-              type="number"
-              id="semester"
-              value={data.semester}
-              onChange={(e) => setData({ ...data, semester: e.target.value })}
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -165,7 +151,7 @@ const Subjects = () => {
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
-          <div className="w-[40%]">
+          <div className="w-[40%] mb-4">
             <label htmlFor="offering_branch" className="leading-7 text-sm ">
               Offered by which Branch
             </label>
@@ -183,6 +169,27 @@ const Subjects = () => {
                   </option>
                 );
               })}
+            </select>
+          </div>
+          <div className="w-[40%]">
+            <label htmlFor="semester" className="leading-7 text-sm ">
+              Select Semester
+            </label>
+            <select
+              id="semester"
+              className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
+              value={data.semester}
+              onChange={(e) => setData({ ...data, semester: e.target.value })}
+            >
+              <option defaultValue>-- Select --</option>
+              <option value="1">1st Semester</option>
+              <option value="2">2nd Semester</option>
+              <option value="3">3rd Semester</option>
+              <option value="4">4th Semester</option>
+              <option value="5">5th Semester</option>
+              <option value="6">6th Semester</option>
+              <option value="7">7th Semester</option>
+              <option value="8">8th Semester</option>
             </select>
           </div>
           <button

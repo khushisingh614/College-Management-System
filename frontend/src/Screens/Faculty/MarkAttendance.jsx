@@ -23,7 +23,7 @@ const MarkAttendance = () => {
         console.log("API Base URL:", API_BASE_URL); // Debugging
     
         try {
-            await axios.post(`${API_BASE_URL}/mark`, attendanceData);
+            await axios.post(`${API_BASE_URL}/attendance/mark`, attendanceData);
             alert("Attendance marked successfully!");
         } catch (error) {
             console.error("Error marking attendance", error.response ? error.response.data : error);
@@ -50,4 +50,3 @@ const MarkAttendance = () => {
 };
 
 export default MarkAttendance;
-

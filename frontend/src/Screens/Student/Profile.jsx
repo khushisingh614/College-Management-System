@@ -7,6 +7,8 @@ import { baseApiURL } from "../../baseUrl";
 import toast from "react-hot-toast";
 const Profile = () => {
   const [showPass, setShowPass] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [shownewPassword, setShownewPassword] = useState(false);
   const router = useLocation();
   const [data, setData] = useState();
   const dispatch = useDispatch();
@@ -14,86 +16,6 @@ const Profile = () => {
     new: "",
     current: "",
   });
-
-const [isOnline, setIsOnline] = useState(navigator.onLine);
-
-useEffect(() => {
-  const handleOnline = () => setIsOnline(true);
-  const handleOffline = () => setIsOnline(false);
-
-  window.addEventListener("online", handleOnline);
-  window.addEventListener("offline", handleOffline);
-
-  return () => {
-    window.removeEventListener("online", handleOnline);
-    window.removeEventListener("offline", handleOffline);
-  };
-}, []);
-
-useEffect(() => {
-  if (isOnline) {
-    syncOfflineChanges();
-  }
-}, [isOnline]);
-
-const syncOfflineChanges = async () => {
-  let pendingChanges = JSON.parse(localStorage.getItem("offlinePasswords")) || [];
-
-  if (pendingChanges.length === 0) {
-    console.log("No offline password changes to sync."); // ✅ Debugging
-    return;
-  }
-
-  console.log("Syncing offline password changes:", pendingChanges); // ✅ Debugging
-
-  for (const change of pendingChanges) {
-    try {
-      let userId = change.id; // Use stored ID if available
-
-      // 🔍 If ID is missing, fetch the user ID first
-      if (!userId) {
-        console.log(`Fetching user ID for login ID: ${change.loginid}`);
-        const loginResponse = await axios.post(
-          `${baseApiURL()}/student/auth/login`,
-          { loginid: change.loginid, password: change.currentPassword },
-          { headers: { "Content-Type": "application/json" } }
-        );
-
-        if (loginResponse.data.success) {
-          userId = loginResponse.data.id; // ✅ Get correct ID from backend
-          console.log(`Fetched user ID: ${userId}`);
-        } else {
-          console.error(`Failed to get user ID: ${loginResponse.data.message}`);
-          toast.error(`Failed to sync password for ${change.loginid}.`);
-          continue; // Skip this change
-        }
-      }
-
-      // 🔄 Now, update the password using the correct ID
-      console.log(`Syncing password change for user ID: ${userId}`);
-
-      const updateResponse = await axios.put(
-        `${baseApiURL()}/student/auth/update/${userId}`,
-        { password: change.newPassword },
-        { headers: { "Content-Type": "application/json" } }
-      );
-
-      if (updateResponse.data.success) {
-        toast.success(`Password for ${change.loginid} synced successfully!`);
-      } else {
-        toast.error(`Failed to sync password for ${change.loginid}.`);
-      }
-    } catch (error) {
-      console.error(`Error syncing password for ${change.loginid}:`, error);
-      toast.error(`Failed to sync password for ${change.loginid}.`);
-    }
-  }
-
-  // ✅ Clear stored changes after syncing
-  localStorage.removeItem("offlinePasswords");
-  console.log("Cleared offline password changes after sync."); // ✅ Debugging
-};
-
   useEffect(() => {
     const headers = {
       "Content-Type": "application/json",
@@ -115,7 +37,6 @@ const syncOfflineChanges = async () => {
               semester: response.data.user[0].semester,
               enrollmentNo: response.data.user[0].enrollmentNo,
               branch: response.data.user[0].branch,
-              _id: response.data.user[0]._id,
             })
           );
         } else {
@@ -127,102 +48,36 @@ const syncOfflineChanges = async () => {
       });
   }, [dispatch, router.state.loginid, router.state.type]);
 
-  //  const checkPasswordHandler = (e) => { 
-  //   e.preventDefault();
-  //   const headers = {
-  //     "Content-Type": "application/json",
-  //   };
-  //   axios
-  //     .post(
-  //       `${baseApiURL()}/student/auth/login`,
-  //       { loginid: router.state.loginid, password: password.current },
-  //       {
-  //         headers: headers,
-  //       }
-  //     )
-  //     .then((response) => {
-  //       if (response.data.success) {
-  //         changePasswordHandler(response.data.id);
-  //       } else {
-  //         toast.error(response.data.message);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       toast.error(error.response.data.message);
-  //       console.error(error);
-  //     });
-  // };
-  const checkPasswordHandler = async (e) => {
+  const checkPasswordHandler = (e) => {
     e.preventDefault();
-  
-    if (!password.current || !password.new) {
-      toast.error("Please enter both current and new password.");
-      return;
-    }
-  
-    if (isOnline) {
-      // User is online, proceed with API request
-      try {
-        const response = await axios.post(
-          `${baseApiURL()}/student/auth/login`,
-          { loginid: router.state.loginid, password: password.current },
-          { headers: { "Content-Type": "application/json" } }
-        );
-  
+    const headers = {
+      "Content-Type": "application/json",
+    };
+    axios
+      .post(
+        `${baseApiURL()}/student/auth/login`,
+        { loginid: router.state.loginid, password: password.current },
+        {
+          headers: headers,
+        }
+      )
+      .then((response) => {
         if (response.data.success) {
           changePasswordHandler(response.data.id);
         } else {
           toast.error(response.data.message);
         }
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Login failed.");
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
         console.error(error);
-      }
-    } else {
-      // User is offline, save the request for later
-      saveOfflinePasswordChange({
-        loginid: router.state.loginid,
-        newPassword: password.new,
-        currentPassword: password.current,
       });
-  
-      toast.success("You're offline! Password change will sync when online.");
-      setPassword({ new: "", current: "" });
-    }
   };
-  
-  const saveOfflinePasswordChange = (passwordData) => {
-    let pendingChanges = JSON.parse(localStorage.getItem("offlinePasswords")) || [];
-  
-    // Make sure we store the correct ID (if available)
-    const changeWithId = {
-      id: passwordData.id || null, // Store ID if available
-      loginid: passwordData.loginid,
-      newPassword: passwordData.newPassword,
-      currentPassword: passwordData.currentPassword,
-    };
-  
-    pendingChanges.push(changeWithId);
-    localStorage.setItem("offlinePasswords", JSON.stringify(pendingChanges));
-  
-    console.log("Saved offline password changes:", pendingChanges); // ✅ Debugging
-  };
-  
-
-  //...
-
- 
- 
-  
-  
- 
-      
 
   const changePasswordHandler = (id) => {
     const headers = {
       "Content-Type": "application/json",
     };
-    console.log("id", id);
     axios
       .put(
         `${baseApiURL()}/student/auth/update/${id}`,
@@ -250,54 +105,72 @@ const syncOfflineChanges = async () => {
       {data && (
         <>
           <div className="flex items-center gap-8">
-            <img
-              src={`${process.env.REACT_APP_MEDIA_LINK}/${data.profile || data[0]?.profile}`}
-              alt="Profile"
-              className="h-40 w-40 object-cover rounded-lg shadow-lg"
-            />
-            <div>
-              <h2 className="text-3xl font-bold">Hello, {data.firstName || data[0]?.firstName} {data.middleName || data[0]?.middleName} {data.lastName || data[0]?.lastName} 👋</h2>
-              <p className="text-lg mt-2">ID: <span className="font-medium">{data.employeeId || data[0]?.employeeId || data.enrollmentNo}</span></p>
-              <p className="text-lg">Phone: <span className="font-medium">+91 {data.phoneNumber || data[0]?.phoneNumber}</span></p>
-              <p className="text-lg">Email: <span className="font-medium">{data.email || data[0]?.email}</span></p>
-              {data.branch && <p className="text-lg">Branch: <span className="font-medium">{data.branch}</span></p>}
-              {data.semester && <p className="text-lg">Semester: <span className="font-medium">{data.semester}</span></p>}
-              {data.post && <p className="text-lg">Post: <span className="font-medium">{data.post}</span></p>}
-              {data.department && <p className="text-lg">Department: <span className="font-medium">{data.department}</span></p>}
+             <img
+               src={process.env.REACT_APP_MEDIA_LINK + "/" + data.profile}
+               alt="student Profile"
+               className="h-40 w-40 object-cover rounded-lg shadow-lg"
+             />
+             <div>
+               <h2 className="text-3xl font-bold">Hello, {data.firstName || data[0]?.firstName} {data.middleName || data[0]?.middleName} {data.lastName || data[0]?.lastName} 👋</h2>
+               <p className="text-lg mt-2">ID: <span className="font-medium">{data.employeeId || data[0]?.employeeId || data.enrollmentNo}</span></p>
+               <p className="text-lg">Phone: <span className="font-medium">+91 {data.phoneNumber || data[0]?.phoneNumber}</span></p>
+               <p className="text-lg">Email: <span className="font-medium">{data.email || data[0]?.email}</span></p>
+               {data.branch && <p className="text-lg">Branch: <span className="font-medium">{data.branch}</span></p>}
+               {data.semester && <p className="text-lg">Semester: <span className="font-medium">{data.semester}</span></p>}
+               {data.post && <p className="text-lg">Post: <span className="font-medium">{data.post}</span></p>}
+               {data.department && <p className="text-lg">Department: <span className="font-medium">{data.department}</span></p>}
             </div>
             <button
-              className={`${
-                showPass ? "bg-red-100 text-red-600" : "bg-blue-600 text-white"
-              }  px-3 py-1 rounded mt-4`}
+              className={`mt-6 px-5 py-2 rounded-lg  text-black font-bold ${showPass ? "bg-white hover:bg-red-300 hover:text-[#7D0A0A]" : "bg-[#E8F9FF] hover:bg-[#410445] hover:text-white"}`}
               onClick={() => setShowPass(!showPass)}
             >
               {!showPass ? "Change Password" : "Close Change Password"}
             </button>
             {showPass && (
               <form
-                className="mt-4 border-t-2 border-blue-500 flex flex-col justify-center items-start"
+                className="mt-6 border-t pt-4"
                 onSubmit={checkPasswordHandler}
               >
-                <input
-                  type="password"
-                  value={password.current}
-                  onChange={(e) =>
-                    setPassword({ ...password, current: e.target.value })
-                  }
-                  placeholder="Current Password"
-                  className="px-3 py-1 border-2 border-blue-500 outline-none rounded mt-4"
-                />
-                <input
-                  type="password"
-                  value={password.new}
-                  onChange={(e) =>
-                    setPassword({ ...password, new: e.target.value })
-                  }
-                  placeholder="New Password"
-                  className="px-3 py-1 border-2 border-blue-500 outline-none rounded mt-4"
-                />
+                <div className="mb-4 relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password.current}
+                    onChange={(e) =>
+                      setPassword({ ...password, current: e.target.value })
+                    }
+                    placeholder="Current Password"
+                    className="w-full p-3 border rounded-lg bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-4 text-gray-800"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+
+                <div className="mb-4 relative">
+                  <input
+                    type={shownewPassword ? "text" : "password"}
+                    value={password.new}
+                    onChange={(e) =>
+                      setPassword({ ...password, new: e.target.value })
+                    }
+                    placeholder="New Password"
+                    className="w-full p-3 border rounded-lg bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-4 text-gray-800"
+                    onClick={() => setShownewPassword(!shownewPassword)}
+                  >
+                    {shownewPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+                
                 <button
-                  className="mt-4 hover:border-b-2 hover:border-blue-500"
+                  className="w-full bg-[#E8F9FF] text-black font-bold hover:bg-[black] hover:text-white  py-2 rounded-lg transition duration-300"
                   onClick={checkPasswordHandler}
                   type="submit"
                 >
@@ -306,6 +179,7 @@ const syncOfflineChanges = async () => {
               </form>
             )}
           </div>
+          
         </>
       )}
     </div>
@@ -313,5 +187,3 @@ const syncOfflineChanges = async () => {
 };
 
 export default Profile;
-
-

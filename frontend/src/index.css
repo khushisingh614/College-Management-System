@@ -2,11 +2,12 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "Poppins", "greatVibes", "lavishlyYours" sans-serif;
+  font-family: "Poppins", "greatVibes", "lavishlyYours", sans-serif;
 }
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Lavishly+Yours&family=Merienda:wght@300..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lavishly+Yours&family=Merienda:wght@300..900&display=swap');
+ @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lavishly+Yours&family=Merienda:wght@300..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

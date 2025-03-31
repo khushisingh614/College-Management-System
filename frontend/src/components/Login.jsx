@@ -1,48 +1,49 @@
 import React, { useState } from "react";
-import { FiLogIn } from "react-icons/fi";
 import { useForm } from "react-hook-form";
+import { FiLogIn } from "react-icons/fi";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { baseApiURL } from "../baseUrl";
 
 const Login = () => {
-  const [selected, setSelected] = useState("Student");
-  const bgImage =
-    "/clg.jpg";
-    const navigate = useNavigate();
+  const bgImage ="/clg.jpg";
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [selected, setSelected] = useState("Student");
   const [otpSent, setOtpSent] = useState(false);
   const [loginData, setLoginData] = useState({});
   const { register, handleSubmit } = useForm();
   const [temporary , setTemporary] = useState(false);
   const [loginAttempts, setLoginAttempts] = useState(0);
-   const [otpAttempts, setOtpAttempts] = useState(0);
-   const [loginid , setLoginid] = useState(0);
- 
-   const [userEmail , setUserEmail] = useState("");
- 
-   const fetchUserEmail = async (loginid) => {
-     try {
-       if (!loginid) return; 
-       const requestData = 
-       selected.toLowerCase() === "student" 
-       ? { enrollmentNo: loginid } 
-       : { employeeId: loginid };
-       console.log(requestData);
-       const response = await axios.post(`${baseApiURL()}/${selected.toLowerCase()}/details/getDetails`, requestData);
-       if (response.data.success && response.data.user.length > 0) {
-         setUserEmail(response.data.user[0].email);
-       }   
-     } catch (error) {
-       console.error("Error fetching user email:", error);
-     }
-   };
- 
-   const notifyAdmin = async (email) => {
-     await axios.post(`${baseApiURL()}/notify-security`, { email })
-       .catch(err => console.error("Email notification error:", err));
-   };
+  const [otpAttempts, setOtpAttempts] = useState(0);
+  const [loginid , setLoginid] = useState(0);
+
+  const [userEmail , setUserEmail] = useState("");
+
+  const fetchUserEmail = async (loginid) => {
+    try {
+      if (!loginid) return; 
+      const requestData = 
+      selected.toLowerCase() === "student" 
+      ? { enrollmentNo: loginid } 
+      : { employeeId: loginid };
+      console.log(requestData);
+      const response = await axios.post(`${baseApiURL()}/${selected.toLowerCase()}/details/getDetails`, requestData);
+      if (response.data.success && response.data.user.length > 0) {
+        setUserEmail(response.data.user[0].email);
+      }   
+    } catch (error) {
+      console.error("Error fetching user email:", error);
+    }
+  };
+
+  const notifyAdmin = async (email) => {
+    await axios.post(`${baseApiURL()}/notify-security`, { email })
+      .catch(err => console.error("Email notification error:", err));
+  };
+
+
   const onSubmit = (data) => {
     if (data.loginid !== "" && data.password !== "") {
       const headers = {
@@ -70,17 +71,18 @@ const Login = () => {
         .catch((error) => {
           toast.dismiss();
           setLoginAttempts(prev => prev + 1);
-           if (loginAttempts + 1 >= 3 && !userEmail) {
-             fetchUserEmail(data.loginid);  // Fetch email if not set
- 
-           }
-           
-           if (loginAttempts + 1 >= 3 && userEmail) {
-             notifyAdmin(userEmail);
-           }
+          if (loginAttempts + 1 >= 3 && !userEmail) {
+            fetchUserEmail(data.loginid);  // Fetch email if not set
+
+          }
+          
+          if (loginAttempts + 1 >= 3 && userEmail) {
+            notifyAdmin(userEmail);
+          }
           console.error(error);
           toast.error(error.response?.data?.message || "Invalid credentials!");
         });
+    } else {
     }
   };
 
@@ -95,60 +97,61 @@ const Login = () => {
         toast.success("Login Successful!");
         setTemporary(false);
         setOtpAttempts(0);
-         setLoginid(response.data.loginid);
+        setLoginid(response.data.loginid);
         navigate(`/${selected.toLowerCase()}`, {
           state: { type: selected, loginid: response.data.loginid , temporary: false},
         });
       })
       .catch((error) => {
         toast.dismiss();
-         setOtpAttempts(prev => prev + 1);
-         
-         if (otpAttempts + 1 >= 3 && !userEmail) {
-           fetchUserEmail(loginid);  // Fetch email if not set
-         }
-         
-         if (otpAttempts + 1 >= 3 && userEmail) {
-           notifyAdmin(userEmail);
-         }
+        setOtpAttempts(prev => prev + 1);
+        
+        if (otpAttempts + 1 >= 3 && !userEmail) {
+          fetchUserEmail(loginid);  // Fetch email if not set
+        }
+        
+        if (otpAttempts + 1 >= 3 && userEmail) {
+          notifyAdmin(userEmail);
+        }
         toast.error(error.response?.data?.message || "Invalid OTP!");
       });
   };
 
   return (
     <div
-      className="bg-cover bg-center min-h-screen items-center justify-between px-12 relative"
-      style={{ backgroundImage: "url('/clgbg.jpg')" }}
-    >
-      <div className="font-semibold text-[35px] text-center mb-4 pt-2 text-black font-Poppins italic">OneStop CollegeApp </div>
-      <div className="absolute top-4 right-8 flex space-x-6">
-        {["Student", "Faculty", "Admin"].map((role) => (
-          <button
-            key={role}
-            className={`text-xl font-semibold transition-all hover:border-b-2 hover:border-green-500 ${
-              selected === role ? "border-b-2 border-green-500 text-green-600" : "text-white"
-            }`}
-            onClick={() => setSelected(role)}
-          >
-            {role}
-          </button>
-        ))}
-      </div>
-      <div className="flex mt-40 ml-4">
-      <div className="w-1/2 grid grid-cols-2 gap-4">
-        <img src='/prof2.jpg' alt="Service 1" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
-        <img src='/lib.jpg' alt="Service 2" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
-        <img src='/class.jpg' alt="Service 3" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
-        <img src='/prof.jpg' alt="Service 4" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
-      </div>
-
-      
-      <div className="w-1/2 flex justify-center">
-        <div className="bg-white px-8 py-6 rounded-xl shadow-xl w-[520px] h-[417px] ml-16">
-        
-          <h1 className="font-semibold text-[45px] text-center mb-10 mt-4 text-black font-greatVibes">
-            {selected} Login
-          </h1>
+       className="bg-cover bg-center min-h-screen items-center justify-between px-12 relative"
+       style={{ backgroundImage: "url('/clgbg.jpg')" }}
+     >
+       <div className="font-semibold text-[35px] text-center mb-4 pt-2 text-black font-Poppins italic"> </div>
+       <br />
+       <div className="absolute top-4 right-8 flex space-x-6">
+         {["Student", "Faculty", "Admin"].map((role) => (
+           <button
+             key={role}
+             className={`text-xl font-semibold transition-all hover:border-b-2 hover:border-green-500 ${
+               selected === role ? "border-b-2 border-green-500 text-green-600" : "text-white"
+             }`}
+             onClick={() => setSelected(role)}
+           >
+             {role}
+           </button>
+         ))}
+       </div>
+       <div className="flex mt-40 ml-4">
+       <div className="w-1/2 grid grid-cols-2 gap-4">
+         <img src='/prof2.jpg' alt="Service 1" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
+         <img src='/lib.jpg' alt="Service 2" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
+         <img src='/class.jpg' alt="Service 3" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
+         <img src='/prof.jpg' alt="Service 4" className="w-full h-[200px] object-cover rounded-lg shadow-lg" />
+       </div>
+ 
+       
+       <div className="w-1/2 flex justify-center">
+         <div className="bg-white px-8 py-6 rounded-xl shadow-xl w-[520px] h-[417px] ml-16">
+         
+           <h1 className="font-semibold text-[45px] text-center mb-10 mt-4 text-black font-greatVibes">
+             {selected} Login
+           </h1>
 
         {!otpSent ? (
         <form
@@ -217,36 +220,10 @@ const Login = () => {
         </form>
         )}
       </div>
-      <div className="absolute top-4 right-4">
-        <button
-          className={`text-blue-500 mr-6 text-base font-semibold hover:text-blue-700 ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-            selected === "Student" && "border-b-2 border-green-500"
-          }`}
-          onClick={() => setSelected("Student")}
-        >
-          Student
-        </button>
-        <button
-          className={`text-blue-500 mr-6 text-base font-semibold hover:text-blue-700 ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-            selected === "Faculty" && "border-b-2 border-green-500"
-          }`}
-          onClick={() => setSelected("Faculty")}
-        >
-          Faculty
-        </button>
-        <button
-          className={`text-blue-500 mr-6 text-base font-semibold hover:text-blue-700 ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-            selected === "Admin" && "border-b-2 border-green-500"
-          }`}
-          onClick={() => setSelected("Admin")}
-        >
-          Admin
-        </button>
-      </div>
       <Toaster position="bottom-center" />
     </div>
     </div>
-    </div>
+     </div>
   );
 };
 

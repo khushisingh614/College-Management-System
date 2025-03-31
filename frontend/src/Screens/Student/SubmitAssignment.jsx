@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { baseApiURL } from "../../baseUrl";
-import Dashboard from "./Dashboard";
+import Dashboard from "./AssignmentDashboard";
 
 const SubmitAssignment = (id) => {
   const assignmentId = id.id;
@@ -178,4 +178,3 @@ export default SubmitAssignment;
       setMessage("Error submitting assignment");
     }
   };*/
-

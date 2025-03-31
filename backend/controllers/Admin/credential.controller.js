@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
 const loginHandler = async (req, res) => {
     let { loginid, password } = req.body;
     try {
-        let user = await adminCredential.findOne({ loginid: Number(loginid) });
+        let user = await adminCredential.findOne({ loginid });
         if (!user) {
             return res
                 .status(400)
@@ -33,19 +33,19 @@ const loginHandler = async (req, res) => {
         if (!isMatch) {
             return res
                 .status(400)
-                .json({ success: false, message: "Wrong Credentials salting issue" });
+                .json({ success: false, message: "Wrong Credentials" });
         }
 
         // Generate OTP
         const otp = crypto.randomInt(100000, 999999).toString();
         otpStore[loginid] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // OTP expires in 5 minutes
 
-        let admin = await adminData.findOne({ employeeId: Number(loginid) }).exec();
-        console.log(admin)
+        let admin = await adminData.findOne({ employeeId: loginid }).exec();
+
         // Send OTP via email
         const mailOptions = {
         from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER, //admin.email // Ensure email exists in user model
+        to: admin.email, // Ensure email exists in user model
         subject: "Your OTP Code",
         text: `Your OTP code is ${otp}. It expires in 5 minutes.`,
         };

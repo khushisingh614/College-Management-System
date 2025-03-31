@@ -27,11 +27,13 @@ const loginHandler = async (req, res) => {
         .json({ success: false, message: "Wrong Credentials" });
     }
 
+
     const staticSalt = process.env.STATIC_SALT || "mySecretStaticSalt";
     const isMatch = await bcrypt.compare(
       user.dynamic_salt + password + staticSalt,
       user.password
     );
+
     if (!isMatch && password == user.temporary_password) {
       if (new Date() > user.temporary_password_expires_at) {
         // Remove expired temporary password
@@ -54,6 +56,7 @@ const loginHandler = async (req, res) => {
         id: user.id,
       });
     }
+
     if (!isMatch) {
       return res
         .status(400)
@@ -73,17 +76,17 @@ const loginHandler = async (req, res) => {
     subject: "Your OTP Code",
     text: `Your OTP code is ${otp}. It expires in 5 minutes.`,
     };
-    // used for sending the otp
+
     transporter.sendMail(mailOptions, (error) => {
-    if (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Error sending OTP" });
-    }
-    res.json({
-        success: true,
-        message: "OTP sent to your email",
-        loginid: user.loginid,
-    });
+      if (error) {
+          console.log(error);
+          return res.status(500).json({ success: false, message: "Error sending OTP" });
+      }
+      res.json({
+          success: true,
+          message: "OTP sent to your email",
+          loginid: user.loginid,
+      });
     });
 
     const data = {
@@ -98,7 +101,7 @@ const loginHandler = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
-//to verify the sent otp with the recieved otp
+
 const verifyOtpHandler = async (req, res) => {
   let { loginid, otp } = req.body;
 
@@ -126,14 +129,14 @@ const registerHandler = async (req, res) => {
         message: "User With This LoginId Already Exists",
       });
     }
-  // Adding both static and dynamic salt in the passwords for encypting it in database, for increasing security
+
     const staticSalt = process.env.STATIC_SALT || "mySecretStaticSalt";
     const dynamicSalt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(
       dynamicSalt + password + staticSalt,
       10
     );
-   // Adding credentials of the faculty
+
     user = await facultyCredential.create({
       loginid,
       password: hashedPassword,
@@ -152,6 +155,7 @@ const registerHandler = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
 const updateTemporaryHandler = async (req, res) => {
   try {
     let user = await facultyCredential.findOne({loginid: req.body.id});
@@ -197,6 +201,7 @@ const updateTemporaryHandler = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
 const updateHandler = async (req, res) => {
   try {
     let user = await facultyCredential.findById(req.params.id);

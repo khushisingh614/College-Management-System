@@ -2,30 +2,41 @@ const adminDetails = require("./models/Admin/details.model.js");
 const adminCredential = require("./models/Admin/credential.model.js");
 const connectToMongo = require("./Database/db.js");
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+require("dotenv").config();
 
 const seedData = async () => {
     try {
         await connectToMongo();
 
-        await adminCredential.deleteMany({})
-        await adminDetails.deleteMany({})
+        // Clear existing admin data
+        await adminCredential.deleteMany({});
+        await adminDetails.deleteMany({});
 
-        await adminCredential.create({
-            loginid: 123456,
-            password: "admin123",
-            dynamic_salt: "dynamic_salt"
+        // Generate dynamic salt
+        const dynamicSalt = await bcrypt.genSalt(10);
+        const staticSalt = process.env.STATIC_SALT || "mySecretStaticSalt";
+        const password = "12345";
+        const hashedPassword = await bcrypt.hash(dynamicSalt + password + staticSalt, 10);
+
+        // Create admin credentials with encrypted password
+        const adminCred = await adminCredential.create({
+            loginid: 1,
+            password: hashedPassword,
+            dynamic_salt: dynamicSalt
         });
 
+        // Create admin details
         const adminDetail = {
-            employeeId: "123456",
-            firstName: "Sundar",
-            middleName: "R",
-            lastName: "Pichai",
-            email: "sundarpichar@gmail.com",
+            employeeId: "1",
+            firstName: "Khushi",
+            middleName: "",
+            lastName: "Singh",
+            email: "khushiinterns1411@gmail.com",
             phoneNumber: "1234567890",
-            gender: "Male",
+            gender: "Female",
             type: "Admin",
-            profile: "Faculty_Profile_123456.jpg",
+            profile: "Admin_Profile_1.jpg",
         };
 
         await adminDetails.create(adminDetail);

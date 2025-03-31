@@ -1,4 +1,4 @@
-const Attendance = require("../../models/Other/attendence.model.js");
+const Attendance = require("../../models/Other/attendance.model.js");
 const Student = require("../../models/Students/details.model.js");
 
 const mongoose = require("mongoose");
@@ -38,7 +38,8 @@ const markAttendance = async (req, res) => {
 
 // Fetch Attendance for a Student
 
-const getStudentAttendance = async (req, res) => {
+const getAttendanceByStudent = async (req, res) => {
+  console.log(req.params);
   try {
     const { studentId } = req.params;
 
@@ -93,7 +94,7 @@ const getStudentAttendance = async (req, res) => {
 };
 
 
-const getSubjectAttendance = async (req, res) => {
+const getAttendanceBySubject = async (req, res) => {
   try {
     const { subjectId } = req.params;
 
@@ -142,4 +143,4 @@ const getSubjectAttendance = async (req, res) => {
 
 
 
-module.exports = { markAttendance, getStudentAttendance, getSubjectAttendance };
+module.exports = { markAttendance, getAttendanceByStudent, getAttendanceBySubject };

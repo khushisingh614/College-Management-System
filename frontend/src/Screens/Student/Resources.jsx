@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaComments, FaHeadset, FaHospital, FaGraduationCap, FaBrain, FaPhone } from "react-icons/fa";
-import "bootstrap/dist/css/bootstrap.min.css";
+
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState(null);

@@ -7,7 +7,6 @@ const EditStudent = () => {
   const [file, setFile] = useState();
   const [branch, setBranch] = useState();
   const [search, setSearch] = useState();
-  const [subjects, setSubjects] = useState([]);
   const [searchActive, setSearchActive] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [data, setData] = useState({
@@ -21,7 +20,6 @@ const EditStudent = () => {
     branch: "",
     gender: "",
     profile: "",
-    subjects: [],
   });
   const [id, setId] = useState();
   const getBranchData = () => {
@@ -42,22 +40,8 @@ const EditStudent = () => {
       });
   };
 
-  const getSubjects = () => {
-    axios
-      .get(`${baseApiURL()}/subject/getSubject`)
-      .then((response) => {
-        if (response.data.success) {
-          setSubjects(response.data.subject);
-        } else {
-          toast.error(response.data.message);
-        }
-      })
-      .catch((error) => console.error(error));
-  };
-
   useEffect(() => {
     getBranchData();
-    getSubjects();
   }, []);
 
   const handleFileChange = (e) => {
@@ -71,43 +55,84 @@ const EditStudent = () => {
     e.preventDefault();
     toast.loading("Updating Student");
     const formData = new FormData();
-    Object.keys(data).forEach((key) => {
-      formData.append(key, data[key]);
-    });
+    formData.append("enrollmentNo", data.enrollmentNo);
+    formData.append("firstName", data.firstName);
+    formData.append("middleName", data.middleName);
+    formData.append("lastName", data.lastName);
+    formData.append("email", data.email);
+    formData.append("phoneNumber", data.phoneNumber);
+    formData.append("semester", data.semester);
+    formData.append("branch", data.branch);
+    formData.append("gender", data.gender);
     if (file) {
       formData.append("type", "profile");
       formData.append("profile", file);
     }
-
+    const headers = {
+      "Content-Type": "multipart/form-data",
+    };
     axios
-      .put(`${baseApiURL()}/student/details/updateDetails/${id}`, formData)
-      .then((response) => {
-        toast.dismiss();
-        response.data.success ? toast.success(response.data.message) : toast.error(response.data.message);
+      .put(`${baseApiURL()}/student/details/updateDetails/${id}`, formData, {
+        headers: headers,
       })
-      .catch((error) => {
-        toast.dismiss();
-        toast.error(error.response?.data?.message || "Update failed");
-      });
-  };
-
-  const searchStudentHandler = (e) => {
-    e.preventDefault();
-    toast.loading("Getting Student");
-    axios
-      .post(`${baseApiURL()}/student/details/getDetails`, { enrollmentNo: search })
       .then((response) => {
         toast.dismiss();
-        if (response.data.success && response.data.user.length > 0) {
-          setData(response.data.user[0]);
-          setId(response.data.user[0]._id);
+        if (response.data.success) {
+          toast.success(response.data.message);
+          clearSearchHandler();
         } else {
-          toast.error("No Student Found!");
+          toast.error(response.data.message);
         }
       })
       .catch((error) => {
         toast.dismiss();
-        toast.error(error.response?.data?.message || "Search failed");
+        toast.error(error.response.data.message);
+      });
+  };
+
+  const searchStudentHandler = (e) => {
+    setSearchActive(true);
+    e.preventDefault();
+    toast.loading("Getting Student");
+    const headers = {
+      "Content-Type": "application/json",
+    };
+    axios
+      .post(
+        `${baseApiURL()}/student/details/getDetails`,
+        { enrollmentNo: search },
+        { headers }
+      )
+      .then((response) => {
+        toast.dismiss();
+        if (response.data.success) {
+          if (response.data.user.length === 0) {
+            toast.error("No Student Found!");
+          } else {
+            toast.success(response.data.message);
+            setData({
+              enrollmentNo: response.data.user[0].enrollmentNo,
+              firstName: response.data.user[0].firstName,
+              middleName: response.data.user[0].middleName,
+              lastName: response.data.user[0].lastName,
+              email: response.data.user[0].email,
+              phoneNumber: response.data.user[0].phoneNumber,
+              semester: response.data.user[0].semester,
+              branch: response.data.user[0].branch,
+              gender: response.data.user[0].gender,
+              profile: response.data.user[0].profile,
+            });
+            setId(response.data.user[0]._id);
+          }
+        } else {
+          if (response?.data) toast.error(response.data.message);
+          toast.error(response.data.message);
+        }
+      })
+      .catch((error) => {
+        toast.dismiss();
+        if (error?.response?.data) toast.error(error.response.data.message);
+        console.error(error);
       });
   };
 
@@ -126,19 +151,8 @@ const EditStudent = () => {
       semester: "",
       branch: "",
       gender: "",
-      subjects: [],
-      profile: "",
     });
   };
-  const handleSubjectChange = (subjectId) => {
-    setData((prevData) => {
-      const updatedSubjects = prevData.subjects.includes(subjectId)
-        ? prevData.subjects.filter((id) => id !== subjectId)
-        : [...prevData.subjects, subjectId];
-      return { ...prevData, subjects: updatedSubjects };
-    });
-  };
-
 
   return (
     <div className="my-6 mx-auto w-full">
@@ -305,23 +319,6 @@ const EditStudent = () => {
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
-          </div>
-          <div className="w-[40%]">
-            <label htmlFor="subjects" className="leading-7 text-sm">Select Subjects</label>
-            <div className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1">
-              {subjects.map((subject) => (
-                <div key={subject._id} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id={subject._id}
-                    value={subject._id}
-                    checked={data.subjects.includes(subject._id)}
-                    onChange={() => handleSubjectChange(subject._id)}
-                  />
-                  <label htmlFor={subject._id}>{subject.name}</label>
-                </div>
-              ))}
-            </div>
           </div>
           <div className="w-[40%]">
             <label htmlFor="file" className="leading-7 text-sm ">

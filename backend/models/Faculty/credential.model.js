@@ -22,6 +22,7 @@ const facultyCredential = new mongoose.Schema({
     default: null,
     expires: 3600,
   }
+
 }, { timestamps: true });
 
-module.exports = mongoose.model("FacultyCredential", facultyCredential);
+module.exports = mongoose.model("Faculty Credential", facultyCredential);
