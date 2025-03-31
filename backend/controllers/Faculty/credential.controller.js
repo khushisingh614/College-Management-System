@@ -1,6 +1,6 @@
 const facultyCredential = require("../../models/Faculty/credential.model.js");
 const facultyData = require("../../models/Faculty/details.model.js");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");

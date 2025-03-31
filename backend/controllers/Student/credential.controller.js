@@ -1,6 +1,6 @@
 const studentCredential = require("../../models/Students/credential.model.js");
 const studentData = require("../../models/Students/details.model.js");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
