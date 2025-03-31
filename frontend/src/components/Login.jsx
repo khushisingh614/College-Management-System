@@ -55,21 +55,19 @@ const Login = () => {
         })
         .then((response) => {
           setLoginid(data.loginid);
-          navigate(`/${selected.toLowerCase()}`, {
-               state: { type: selected, loginid: response.data.loginid , temporary: true },
-             });
-          // if (response.data.message === "Temporary") {
-          //   setTemporary(true);
-          //   toast.success("Temporary login successful!");
-          //   navigate(`/${selected.toLowerCase()}`, {
-          //     state: { type: selected, loginid: response.data.loginid , temporary: true },
-          //   });
-          // } else {
-          //   toast.success("Password verified! OTP sent.");
-          //   setOtpSent(true);
-          //   setLoginData(data); 
-          //   setLoginAttempts(0);
-          // }
+          
+          if (response.data.message === "Temporary") {
+            setTemporary(true);
+            toast.success("Temporary login successful!");
+            navigate(`/${selected.toLowerCase()}`, {
+              state: { type: selected, loginid: response.data.loginid , temporary: true },
+            });
+          } else {
+            toast.success("Password verified! OTP sent.");
+            setOtpSent(true);
+            setLoginData(data); 
+            setLoginAttempts(0);
+          }
         })
         .catch((error) => {
           toast.dismiss();
