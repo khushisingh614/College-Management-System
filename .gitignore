@@ -25,3 +25,5 @@ yarn-error.log*
 
 temp
 backend/media/*
+backend/.env
+frontend/.env
