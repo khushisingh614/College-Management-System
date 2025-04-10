@@ -26,8 +26,11 @@ const storage = multer.diskStorage({
             filename = `Assignment_${req.body.title}_Subject_${req.body.subject}_${Date.now()}.pdf`;
         } 
         else if (req.body?.type === "submitassignments") {
-            filename = `Submit_Assignment_${req.body.title}_Subject_${req.body.subject}_${Date.now()}.pdf`;
+            filename = `Submit_Assignment_by_${req.body.studentName}_${Date.now()}${path.extname(file.originalname)}`;
         } 
+        if (!filename) {
+            filename = `upload_${Date.now()}${path.extname(file.originalname)}`;
+        }
 
         console.log(filename);
 

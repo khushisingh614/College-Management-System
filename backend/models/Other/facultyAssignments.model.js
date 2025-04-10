@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const facultyAssignment = new mongoose.Schema({
   professorId: { type: Number, required: true },
   title: { type: String, required: true },
+  branch: { type: String, required: true },
+  semester: { type: String, required: true },
   description: { type: String },
   subject: { type: String, required: true },
   totalPoints: { type: Number, required: true },

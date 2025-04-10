@@ -3,9 +3,8 @@ import axios from "axios";
 import { baseApiURL } from "../../baseUrl";
 import Dashboard from "./AssignmentDashboard";
 
-const SubmitAssignment = (id) => {
+const SubmitAssignment = ({id, onClose}) => {
   const assignmentId = id.id;
-  //console.log(assignmentId)
   const deadline = id.deadline;
   
   const [file, setFile] = useState(null);
@@ -94,7 +93,7 @@ const SubmitAssignment = (id) => {
           await deleteSubmissionFromDB(submission._id);
         }
       } catch (error) {
-        console.error(`Failed to sync submission ${submission.submissionId}:`, error);
+        console.error(`Failed to sync submission ${submission._id}:`, error);
       }
     }
   };
@@ -110,11 +109,12 @@ const SubmitAssignment = (id) => {
     if (!file) return setMessage("Please select a file");
 
     const formData = new FormData();
-    formData.append("file", file);
     formData.append("studentName", studentName);
     formData.append("enrollmentNo", enrollmentNo);
     formData.append("assignmentId", assignmentId);
     formData.append("deadline", deadline);
+    formData.append("type", "submitassignments");
+    formData.append("submitassignments", file);
 
     if (navigator.onLine) {
       // Online submission
@@ -124,8 +124,9 @@ const SubmitAssignment = (id) => {
         });
 
         setMessage(response.data.message);
-        localStorage.setItem("submissionId", response.data.submissionId);
-        setTimeout(() => setShowDashboard(true), 1000);
+        setTimeout(() => {
+          if (onClose) onClose();
+        }, 2000);
       } catch (error) {
         setMessage("Error submitting assignment");
       }
@@ -145,7 +146,23 @@ const SubmitAssignment = (id) => {
       <input className="w-full p-2 border rounded mb-3" type="text" placeholder="Your Name" value={studentName} onChange={(e) => setStudentName(e.target.value)} />
       <input className="w-full p-2 border rounded mb-3" type="text" placeholder="Enrollment No." value={enrollmentNo} onChange={(e) => setEnrollmentNo(e.target.value)} />
       <input className="w-full p-2 border rounded mb-3" type="file" onChange={(e) => setFile(e.target.files[0])} />
-      <button className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600" onClick={handleUpload}>Submit</button>
+      <div className="mt-6 flex justify-between items-center gap-4">
+      <button
+        onClick={onClose}
+        className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-1/2"
+      >
+        Close
+      </button>
+
+      <button
+        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-1/2"
+        onClick={handleUpload}
+      >
+        Submit
+      </button>
+      </div>
+
+
       {message && <p className="text-green-600 mt-2">{message}</p>}
     </div>
   );
@@ -153,28 +170,4 @@ const SubmitAssignment = (id) => {
 
 export default SubmitAssignment;
 
-  /*const handleUpload = async () => {
-    if (!file) return setMessage("Please select a file");
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("studentName", studentName);
-    formData.append("enrollmentNo", enrollmentNo);
-    formData.append("assignmentId", assignmentId);
-    formData.append("deadline", deadline);
-
-    try {
-      const response = await axios.post(`${baseApiURL()}/assignments/submit`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      setMessage(response.data.message);
-      localStorage.setItem("submissionId", response.data.submissionId);
-
   
-        setTimeout(() => setShowDashboard(true), 1000);
-      
-    } catch (error) {
-      setMessage("Error submitting assignment");
-    }
-  };*/

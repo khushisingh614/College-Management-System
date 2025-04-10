@@ -19,14 +19,15 @@ const transporter = nodemailer.createTransport({
 
 const loginHandler = async (req, res) => {
     let { loginid, password } = req.body;
+    
+    loginid=Number(loginid)
     try {
-        let user = await adminCredential.findOne({ loginid });
+        let user = await adminCredential.findOne({loginid:loginid});
         if (!user) {
             return res
                 .status(400)
                 .json({ success: false, message: "Wrong Credentials" });
         }
-
         const staticSalt = process.env.STATIC_SALT || "mySecretStaticSalt";
         const isMatch = await bcrypt.compare(user.dynamic_salt + password + staticSalt, user.password);
 

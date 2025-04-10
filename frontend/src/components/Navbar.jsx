@@ -20,7 +20,11 @@ const Navbar = () => {
         </p>
         <button
           className="flex justify-center items-center text-red-200 px-3 py-2 hover:bg-white hover:text-red-700 font-semibold rounded-md"
-          onClick={() => navigate("/")}
+          onClick={() => {
+            sessionStorage.removeItem('AdmnloginId');
+            sessionStorage.removeItem('FacloginId');
+            sessionStorage.removeItem('StudloginId');
+            navigate("/")}}
         >
           Logout
           <span className="ml-2">

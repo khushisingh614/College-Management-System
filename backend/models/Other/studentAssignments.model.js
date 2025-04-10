@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
  const studentAssignments = new mongoose.Schema({
    enrollmentNo: { type: Number, required: true },
    studentName: { type: String, required: true },
-   assignmentId: {type: mongoose.Schema.Types.ObjectId, ref: "facultyAssignments", required: true},
+   assignmentId: {type: mongoose.Schema.Types.ObjectId, ref: "FacultyAssignment", required: true},
    filename: { type: String, required: true },
    filePath: { type: String, required: true },
    deadline: { type: Date, required: true }, 

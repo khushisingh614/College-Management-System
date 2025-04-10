@@ -5,6 +5,8 @@ import { useLocation } from "react-router-dom";
 import { setUserData } from "../../redux/actions";
 import { baseApiURL } from "../../baseUrl";
 import toast from "react-hot-toast";
+import Analytics from "./Analytics";
+import ForumPage from "./ForumPage";
 const Profile = () => {
   const [showPass, setShowPass] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +32,9 @@ const Profile = () => {
       )
       .then((response) => {
         if (response.data.success) {
+          localStorage.setItem("semester",response.data.user[0].semester);
+          localStorage.setItem("branch",response.data.user[0].branch);
+          localStorage.setItem("studentId",response.data.user[0].enrollmentNo);
           setData(response.data.user[0]);
           dispatch(
             setUserData({
@@ -101,6 +106,7 @@ const Profile = () => {
   };
 
   return (
+    <div>
     <div className="max-w-4xl mx-auto mt-10 p-8 bg-gradient-to-r from-[#27548A] to-[#410445] shadow-xl rounded-lg text-white font-poppins">
       {data && (
         <>
@@ -182,6 +188,8 @@ const Profile = () => {
           
         </>
       )}
+    </div>
+    <Analytics/>
     </div>
   );
 };

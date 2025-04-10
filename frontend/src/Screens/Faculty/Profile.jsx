@@ -5,6 +5,7 @@ import { baseApiURL } from "../../baseUrl";
 import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../../redux/actions";
+import ForumPage from "./ForumPage";
 const Profile = (props) => {
   const [showPass, setShowPass] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -32,6 +33,7 @@ const Profile = (props) => {
       .then((response) => {
         if (response.data.success) {
           settemporary(router.state.temporary);
+          localStorage.setItem("facId",response.data.user[0].employeeId);
           setData(response.data.user);
           dispatch(
             setUserData({
@@ -106,6 +108,7 @@ const Profile = (props) => {
   };
 
   return (
+    <div>
     <div className="max-w-4xl mx-auto mt-10 p-8 bg-gradient-to-r from-[#27548A] to-[#410445] shadow-xl rounded-lg text-white font-poppins">
       {data && (
         <>
@@ -193,6 +196,7 @@ const Profile = (props) => {
           
         </>
       )}
+    </div>
     </div>
   );
 };

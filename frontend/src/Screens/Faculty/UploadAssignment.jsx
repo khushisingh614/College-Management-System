@@ -8,8 +8,10 @@ import React, { useState } from "react";
    const [title, setTitle] = useState("");
    const [subject, setSubject] = useState("");
    const [description, setDescription] = useState(""); // Optional
-   const [totalPoints, setTotalPoints] = useState(""); // New Field
-   const [professorId, setProfessorId] = useState(""); // New Field
+   const [totalPoints, setTotalPoints] = useState(""); 
+   const [professorId, setProfessorId] = useState(""); 
+   const [branch,setBranch] = useState("");
+   const [sem,setSem] = useState("");
    const [deadline, setDeadline] = useState(new Date().toISOString().split("T")[0]); // Default: Today
    const [message, setMessage] = useState("");
    const [loading, setLoading] = useState(false); // Prevent multiple clicks
@@ -22,6 +24,8 @@ import React, { useState } from "react";
  
      const formData = new FormData();
      formData.append("title", title);
+     formData.append("branch", branch);
+     formData.append("semester", sem);
      formData.append("subject", subject);
      formData.append("deadline", deadline);
      formData.append("totalPoints", totalPoints);
@@ -71,6 +75,20 @@ import React, { useState } from "react";
          type="text" placeholder="Title (Required)" 
          value={title} 
          onChange={(e) => setTitle(e.target.value)} 
+       />
+
+        <input 
+         className="w-full p-2 border rounded mb-3" 
+         type="text" placeholder="Branch (Required)" 
+         value={branch} 
+         onChange={(e) => setBranch(e.target.value)} 
+       />
+
+        <input 
+         className="w-full p-2 border rounded mb-3" 
+         type="text" placeholder="Semester (Required)" 
+         value={sem} 
+         onChange={(e) => setSem(e.target.value)} 
        />
        
        <input 

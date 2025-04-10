@@ -5,10 +5,13 @@ const path = require("path")
 connectToMongo();
 const port = 5000 || process.env.PORT;
 var cors = require("cors");
-
+require('./sendDeadlineMails');
 app.use(cors({
   origin:"*",
 }));
+
+//file upload routes come before JSON body parsing (for multer to work with multipart formdata)
+app.use("/api/assignments", require("./routes/Other Api/assignments.route"));
 
 app.use(express.json()); //to convert request data to json
 
@@ -35,7 +38,8 @@ app.use("/api/subject", require("./routes/Other Api/subject.route"));
 app.use("/api/marks", require("./routes/Other Api/marks.route"));
 app.use("/api/branch", require("./routes/Other Api/branch.route"));
 app.use("/api/curriculum", require("./routes/Other Api/curriculum.route"));
-app.use("/api/assignments", require("./routes/Other Api/assignments.route"));
+app.use("/api/analytics", require("./routes/Other Api/analytics.route"));
+app.use("/api/forum", require("./routes/Other Api/forum.route"));
 
 app.use("/api/notify-security" , require("./routes/Other Api/notifysecurity.route"));
 app.use("/api/attendance" , require("./routes/Other Api/attendance.route"));
