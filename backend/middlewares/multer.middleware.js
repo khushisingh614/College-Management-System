@@ -28,7 +28,9 @@ const storage = multer.diskStorage({
         else if (req.body?.type === "submitassignments") {
             filename = `Submit_Assignment_${req.body.title}_Subject_${req.body.subject}_${Date.now()}.pdf`;
         } 
-
+        else if (req.body?.type === "notice") {
+            filename = `Notice_${req.body.title}_${Date.now()}.pdf`;
+        }
         console.log(filename);
 
         cb(null, `${filename}`);

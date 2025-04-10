@@ -12,7 +12,7 @@ import { baseApiURL } from "../../baseUrl";
 import { FiUpload } from "react-icons/fi";
 import { AiOutlineClose } from "react-icons/ai";
 
-const Notice = () => {
+const Notice = (prop) => {
   const router = useLocation();
   const [notice, setNotice] = useState([]);
   const [open, setOpen] = useState(false);
@@ -23,7 +23,7 @@ const Notice = () => {
     description: "",
     branch: [],
     semester: [],
-    forwhom: "",
+    forwhom: "student",
   });
   const [branch, setBranch] = useState();
   const [file, setFile] = useState();
@@ -50,12 +50,12 @@ const Notice = () => {
   const getNoticeHandler = () => {
     const headers = { "Content-Type": "application/json" };
     const query = {
-      forwhom: ["student", "faculty", "both"],
+      forwhom: ["faculty", "both"],
+      branch: prop.branch,
     };
     axios
-      .get(`${baseApiURL()}/notice/getNotice`, {
-        headers,
-        data: query,
+      .post(`${baseApiURL()}/notice/getNoticeforfaculty`, query, {
+        headers
       })
       .then((response) => {
         if (response.data.success) {
@@ -82,8 +82,8 @@ const Notice = () => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("description", data.description);
-    data.branch.forEach((b) => formData.append("branch", b));
-    data.semester.forEach((s) => formData.append("semester", s));
+    data.branch.forEach((br) => formData.append("branch[]", br));
+    data.semester.forEach((sem) => formData.append("semester[]", sem));
     formData.append("forwhom" , data.forwhom);
     formData.append("type", "notice");
     if(file){
@@ -157,16 +157,16 @@ const Notice = () => {
       title: notice[index].title,
       description: notice[index].description,
       forwhom: notice[index].forwhom,
-      branch: Array.isArray(notice[index].branch) ? notice[index].branch : [notice[index].branch],
-      semester: Array.isArray(notice[index].semester) ? notice[index].semester : [notice[index].semester],
-    });    
+      branch: notice[index].branch,
+      semester: notice[index].semester,
+    });
     setId(notice[index]._id);
   };
 
   const openHandler = () => {
     setOpen(!open);
     setEdit(false);
-    setData({ title: "", description: "", forwhom: "student", branch: [], semester: [] });
+    setData({ title: "", description: "", forwhom: "student", branch: "", semester: "" });
   };
 
   return (
@@ -271,38 +271,23 @@ const Notice = () => {
           </div>
 
           <div className="w-[40%] mt-4">
-            <label htmlFor="forwhom">Notice Type</label>
-              <select
-                id="forwhom"
-                className="bg-blue-50 py-2 px-4 w-full mt-1 resize-none border"
-                value={data.forwhom}
-                onChange={(e) => setData({ ...data, forwhom: e.target.value })}
-                required
-              >
-              <option value="student">Student</option>
-              <option value="faculty">Faculty</option>
-              <option value="both">Both</option>
-            </select>
-          </div>
-
-          <div className="w-[40%] mt-4">
             <label htmlFor="branch">Branch</label>
             <select
               id="branch"
               multiple
               className="bg-blue-50 py-2 px-4 rounded-sm w-full mt-1 resize-none border"
               value={data.branch}
-              onChange={(e) =>
-                setData({
-                  ...data,
-                  branch: Array.from(e.target.selectedOptions, (option) => option.value),
-                })
-              }
+              onChange={(e) => {
+                const selectedOptions = Array.from(e.target.selectedOptions).map(
+                  (option) => option.value
+                );
+                setData({ ...data, branch: selectedOptions });
+              }}
             >
               {branch &&
-                branch.map((b) => (
-                  <option value={b.name} key={b.name}>
-                    {b.name}
+                branch.map((branch) => (
+                  <option value={branch.name} key={branch.name}>
+                    {branch.name}
                   </option>
                 ))}
             </select>
@@ -314,45 +299,37 @@ const Notice = () => {
             )}
           </div>
 
+          <div className="w-[40%] mt-4">
+            <label htmlFor="semester">Semester</label>
+            <select
+              id="semester"
+              multiple
+              className="bg-blue-50 py-2 px-4 rounded-sm w-full mt-1 resize-none border"
+              value={data.semester}
+              onChange={(e) => {
+                const selectedOptions = Array.from(e.target.selectedOptions).map(
+                  (option) => option.value
+                );
+                setData({ ...data, semester: selectedOptions });
+              }}
+            >
+              <option value="1">1st Semester</option>
+              <option value="2">2nd Semester</option>
+              <option value="3">3rd Semester</option>
+              <option value="4">4th Semester</option>
+              <option value="5">5th Semester</option>
+              <option value="6">6th Semester</option>
+              <option value="7">7th Semester</option>
+              <option value="8">8th Semester</option>
+            </select>
 
-          {data.forwhom !== "faculty" && (
-            <div className="w-[40%] mt-4">
-              <label htmlFor="semester">Semester</label>
-              <select
-                multiple
-                onChange={(e) =>
-                  setData({
-                    ...data,
-                    semester: Array.from(
-                      e.target.selectedOptions,
-                      (option) => option.value
-                    ),
-                  })
-                }
-                value={data.semester}
-                name="semester"
-                id="semester"
-                className="bg-blue-50 py-2 px-4 rounded-sm w-full mt-1 resize-none border"
-              >
-                <option value="1">1st Semester</option>
-                <option value="2">2nd Semester</option>
-                <option value="3">3rd Semester</option>
-                <option value="4">4th Semester</option>
-                <option value="5">5th Semester</option>
-                <option value="6">6th Semester</option>
-                <option value="7">7th Semester</option>
-                <option value="8">8th Semester</option>
-              </select>
+            {data.semester.length > 0 && (
+              <div className="mt-2 text-sm text-blue-700">
+                Selected: {data.semester.join(", ")}
+              </div>
+            )}
 
-              {data.semester.length > 0 && (
-                <div className="mt-2 text-sm text-blue-700">
-                  Selected: {data.semester.join(", ")}
-                </div>
-              )}
-            </div>
-          )}
-
- 
+          </div>  
             
           <div className="w-[40%] mt-4">
             <label htmlFor="upload">File Upload</label>

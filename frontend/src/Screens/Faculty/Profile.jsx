@@ -41,7 +41,7 @@ const Profile = (props) => {
             }),
             props.setemployeeid(response.data.user[0].employeeId),
             props.setTemporary(router.state.temporary),
-          
+            props.setBranch(response.data.user[0].department),
           );
         } else {
           toast.error(response.data.message);

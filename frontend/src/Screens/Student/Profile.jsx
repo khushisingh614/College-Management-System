@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 import { setUserData } from "../../redux/actions";
 import { baseApiURL } from "../../baseUrl";
 import toast from "react-hot-toast";
-const Profile = () => {
+const Profile = (props) => {
   const [showPass, setShowPass] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [shownewPassword, setShownewPassword] = useState(false);
@@ -37,7 +37,10 @@ const Profile = () => {
               semester: response.data.user[0].semester,
               enrollmentNo: response.data.user[0].enrollmentNo,
               branch: response.data.user[0].branch,
-            })
+            }),
+            props.setBranch(response.data.user[0].branch),
+            props.setSemester(response.data.user[0].semester),
+            props.setStudentid(response.data.user[0]._id)
           );
         } else {
           toast.error(response.data.message);

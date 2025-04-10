@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const path = require("path")
 connectToMongo();
+require("./utils/cleanupTodo");
 const port = 5000 || process.env.PORT;
 var cors = require("cors");
 
@@ -23,6 +24,7 @@ app.use('/media', express.static(path.join(__dirname, 'media')));
 app.use("/api/student/auth", require("./routes/Student Api/credential.route"));
 app.use("/api/faculty/auth", require("./routes/Faculty Api/credential.route"));
 app.use("/api/admin/auth", require("./routes/Admin Api/credential.route"));
+
 // Details Apis
 app.use("/api/student/details", require("./routes/Student Api/details.route"));
 app.use("/api/faculty/details", require("./routes/Faculty Api/details.route"));
@@ -39,7 +41,7 @@ app.use("/api/assignments", require("./routes/Other Api/assignments.route"));
 
 app.use("/api/notify-security" , require("./routes/Other Api/notifysecurity.route"));
 app.use("/api/attendance" , require("./routes/Other Api/attendance.route"));
-
+app.use("/api/todo" , require("./routes/Other Api/todolist.route"));
 app.listen(port, () => {
   console.log(`Server Listening On http://localhost:${port}`);
 });

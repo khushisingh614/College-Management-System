@@ -1,141 +1,129 @@
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
-import Profile from "./Profile";
 import Timetable from "./Timetable";
 import Curriculum from "./Curriculum";
 import Marks from "./Marks";
-import Notice from "../../components/Notice";
+import Notice from "./Notice";
 import Material from "./Material";
-import { Toaster } from "react-hot-toast";
 import Attendance from "./Attendance";
 import Resources from "./Resources";
 import AssignmentDashboard from "./AssignmentDashboard";
-import { useLocation, useNavigate } from "react-router-dom";
+import Profile from "./Profile";
+import { Toaster } from "react-hot-toast";
+import Todolist from "./todolist"
+import Sidebar, { SidebarItem } from "../../components/sidebar";
+import {
+  User,
+  Calendar,
+  BookOpen,
+  Clipboard,
+  Bell,
+  FileText,
+  Book,
+  CheckSquare,
+  Archive,
+  ListTodo
+} from "lucide-react";
+
 const Home = () => {
   const [selectedMenu, setSelectedMenu] = useState("My Profile");
   const router = useLocation();
   const navigate = useNavigate();
   const [load, setLoad] = useState(false);
+  const [branch, setBranch] = useState("");
+  const [semester, setSemester] = useState(0);
+  const [studentid , setStudentid] = useState("");
   useEffect(() => {
     if (router.state === null) {
       navigate("/");
     }
     setLoad(true);
   }, [navigate, router.state]);
+
   return (
     <section>
       {load && (
-        <div className="bg-[#E8F9FF] min-h-screen">
-        <>
+        <div className="flex bg-[#E8F9FF] min-h-screen flex-col overflow-visible">
           <Navbar />
-          <div className="max-w-6xl mx-auto">
-            <ul className="flex justify-evenly font-bold items-center gap-10 w-full mx-auto my-4">
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "My Profile"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
+          <div className="flex flex-1 overflow-visible">
+            <Sidebar>
+              <SidebarItem
+                icon={<User size={20} />}
+                text="My Profile"
+                active={selectedMenu === "My Profile"}
                 onClick={() => setSelectedMenu("My Profile")}
-              >
-                My Profile
-              </li>
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Timetable"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
+              />
+              <SidebarItem
+                icon={<Calendar size={20} />}
+                text="Timetable"
+                active={selectedMenu === "Timetable"}
                 onClick={() => setSelectedMenu("Timetable")}
-              >
-                Timetable
-              </li>
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Marks"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
+              />
+              <SidebarItem
+                icon={<Clipboard size={20} />}
+                text="Marks"
+                active={selectedMenu === "Marks"}
                 onClick={() => setSelectedMenu("Marks")}
-              >
-                Marks
-              </li>
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Material"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
+              />
+              <SidebarItem
+                icon={<Book size={20} />}
+                text="Material"
+                active={selectedMenu === "Material"}
                 onClick={() => setSelectedMenu("Material")}
-              >
-                Material
-              </li>
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Curriculum"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
+              />
+              <SidebarItem
+                icon={<BookOpen size={20} />}
+                text="Curriculum"
+                active={selectedMenu === "Curriculum"}
                 onClick={() => setSelectedMenu("Curriculum")}
-              >
-                Curriculum
-              </li>
-
-              
-            </ul>
-            <ul className="flex justify-evenly font-bold items-center gap-10 w-full mx-auto my-4">
-            <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Notice"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
+              />
+              <SidebarItem
+                icon={<Bell size={20} />}
+                text="Notice"
+                active={selectedMenu === "Notice"}
                 onClick={() => setSelectedMenu("Notice")}
-              >
-                Notice
-              </li>
-              <li
-                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                   selectedMenu === "Assignment"
-                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                 }`}
-                 onClick={() => setSelectedMenu("Assignment")}
-               >
-                 Assignment
-               </li>
-               <li
-                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                   selectedMenu === "Attendance"
-                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                 }`}
-                 onClick={() => setSelectedMenu("Attendance")}
-               >
-                 Attendance
-               </li>
-               <li
-                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                   selectedMenu === "Resources"
-                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                 }`}
-                 onClick={() => setSelectedMenu("Resources")}
-               >
-                 Resources
-               </li>
-            </ul>
-            {selectedMenu === "Timetable" && <Timetable />}
-            {selectedMenu === "Marks" && <Marks />}
-            {selectedMenu === "Material" && <Material />}
-            {selectedMenu === "Notice" && <Notice />}
-            {selectedMenu === "Curriculum" && <Curriculum />}
-            {selectedMenu === "My Profile" && <Profile />}
-            {selectedMenu === "Attendance" && <Attendance />}
-            {selectedMenu === "Resources" && <Resources />}
-            {selectedMenu === "Assignment" && <AssignmentDashboard />}
+              />
+              <SidebarItem
+                icon={<FileText size={20} />}
+                text="Assignment"
+                active={selectedMenu === "Assignment"}
+                onClick={() => setSelectedMenu("Assignment")}
+              />
+              <SidebarItem
+                icon={<CheckSquare size={20} />}
+                text="Attendance"
+                active={selectedMenu === "Attendance"}
+                onClick={() => setSelectedMenu("Attendance")}
+              />
+              <SidebarItem
+                icon={<Archive size={20} />}
+                text="Resources"
+                active={selectedMenu === "Resources"}
+                onClick={() => setSelectedMenu("Resources")}
+              />
+              <SidebarItem
+                icon={<ListTodo size={20} />}
+                text="To Do List"
+                active={selectedMenu === "todolist"}
+                onClick={() => setSelectedMenu("todolist")}
+              />
+            </Sidebar>
+            <div className="flex-1">
+              <div className="max-w-6xl mx-auto py-4 px-6">
+                {selectedMenu === "Timetable" && <Timetable />}
+                {selectedMenu === "Marks" && <Marks />}
+                {selectedMenu === "Material" && <Material />}
+                {selectedMenu === "Notice" && <Notice branch={branch} semester={semester}/>}
+                {selectedMenu === "Curriculum" && <Curriculum />}
+                {selectedMenu === "My Profile" && <Profile setBranch = {setBranch} setSemester = {setSemester} setStudentid = {setStudentid}/>}
+                {selectedMenu === "Attendance" && <Attendance />}
+                {selectedMenu === "Resources" && <Resources />}
+                {selectedMenu === "todolist" && <Todolist studentid = {studentid}/>}
+                {selectedMenu === "Assignment" && <AssignmentDashboard />}
+              </div>
+            </div>
           </div>
-        </>
         </div>
       )}
       <Toaster position="bottom-center" />
