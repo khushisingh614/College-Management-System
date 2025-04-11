@@ -7,7 +7,7 @@ import {
   
   const SidebarContext = createContext();
   
-  export default function Sidebar({ children }) {
+  export default function Sidebar({ children, allowedTabs = []  }) {
     const [expanded, setExpanded] = useState(false);
   
     return (

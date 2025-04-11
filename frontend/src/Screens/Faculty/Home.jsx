@@ -34,8 +34,24 @@ const Home = () => {
   const [employeeid, setemployeeid] = useState("");
   const [temporary, setTemporary] = useState(false);
   const [branch, setBranch] = useState("");
+  const [selectedTabs, setSelectedTabs] = useState([]);
+
+  const allTabs = [
+    { key: "My Profile", icon: <User size={20} /> },
+    { key: "Timetable", icon: <Calendar size={20} /> },
+    { key: "Notice", icon: <Bell size={20} /> },
+    { key: "Material", icon: <Book size={20} /> },
+    { key: "Temporary_Access", icon: <Key size={20} /> },
+    { key: "Student Info", icon: <Users size={20} /> },
+    { key: "Upload Marks", icon: <Clipboard size={20} /> },
+    { key: "Curriculum", icon: <BookOpen size={20} /> },
+    { key: "Assignment", icon: <FileText size={20} /> },
+    { key: "Attendance", icon: <CheckSquare size={20} /> },
+  ];
+  
+
   useEffect(() => {
-    if (router.state === null) {
+    if (!router.state) {
       navigate("/");
     }
     setLoad(true);
@@ -49,68 +65,33 @@ const Home = () => {
 
           <Navbar />
           <div className="flex flex-1 overflow-visible">
-            <Sidebar>
-              <SidebarItem
-                icon={<User size={20} />}
-                text="My Profile"
-                active={selectedMenu === "My Profile"}
-                onClick={() => setSelectedMenu("My Profile")}
-              />
-              <SidebarItem
-                icon={<Calendar size={20} />}
-                text="Timetable"
-                active={selectedMenu === "Timetable"}
-                onClick={() => setSelectedMenu("Timetable")}
-              />
-              <SidebarItem
-                icon={<Bell size={20} />}
-                text="Notice"
-                active={selectedMenu === "Notice"}
-                onClick={() => setSelectedMenu("Notice")}
-              />
-              <SidebarItem
-                icon={<Book size={20} />}
-                text="Material"
-                active={selectedMenu === "Material"}
-                onClick={() => setSelectedMenu("Material")}
-              />
-              <SidebarItem
-                icon={<Key size={20} />}
-                text="Temporary Access"
-                active={selectedMenu === "Temporary_Access"}
-                onClick={() => setSelectedMenu("Temporary_Access")}
-              />
-              <SidebarItem
-                icon={<Users size={20} />}
-                text="Student Info"
-                active={selectedMenu === "Student Info"}
-                onClick={() => setSelectedMenu("Student Info")}
-              />
-              <SidebarItem
-                icon={<Clipboard size={20} />}
-                text="Upload Marks"
-                active={selectedMenu === "Upload Marks"}
-                onClick={() => setSelectedMenu("Upload Marks")}
-              />
-              <SidebarItem
-                icon={<BookOpen size={20} />}
-                text="Curriculum"
-                active={selectedMenu === "Curriculum"}
-                onClick={() => setSelectedMenu("Curriculum")}
-              />
-              <SidebarItem
-                icon={<FileText size={20} />}
-                text="Assignment"
-                active={selectedMenu === "Assignment"}
-                onClick={() => setSelectedMenu("Assignment")}
-              />
-              <SidebarItem
-                icon={<CheckSquare size={20} />}
-                text="Attendance"
-                active={selectedMenu === "Attendance"}
-                onClick={() => setSelectedMenu("Attendance")}
-              />
-            </Sidebar>
+          <Sidebar>
+            {temporary ? (
+              selectedTabs.push("My Profile"),
+              allTabs    
+                .filter(tab => selectedTabs.includes(tab.key))
+                .map(tab => (
+                  <SidebarItem
+                    key={tab.key}
+                    icon={tab.icon}
+                    text={tab.key}
+                    active={selectedMenu === tab.key}
+                    onClick={() => setSelectedMenu(tab.key)}
+                  />
+                ))
+            ) : (
+              allTabs.map(tab => (
+                <SidebarItem
+                  key={tab.key}
+                  icon={tab.icon}
+                  text={tab.key}
+                  active={selectedMenu === tab.key}
+                  onClick={() => setSelectedMenu(tab.key)}
+                />
+              ))
+            )}
+          </Sidebar>
+
             <div className="flex-1">
               <div className="max-w-6xl mx-auto py-4 px-6">
                 {selectedMenu === "Timetable" && <Timetable />}
@@ -123,6 +104,7 @@ const Home = () => {
                     setemployeeid={setemployeeid}
                     setTemporary={setTemporary}
                     setBranch = {setBranch}
+                    setSelectedTabs = {setSelectedTabs}
                   />
                 )}
                 {selectedMenu === "Curriculum" && <Curriculum />}

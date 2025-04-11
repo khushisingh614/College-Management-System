@@ -42,6 +42,7 @@ const Profile = (props) => {
             props.setemployeeid(response.data.user[0].employeeId),
             props.setTemporary(router.state.temporary),
             props.setBranch(response.data.user[0].department),
+            props.setSelectedTabs(router.state.selected_tabs),
           );
         } else {
           toast.error(response.data.message);

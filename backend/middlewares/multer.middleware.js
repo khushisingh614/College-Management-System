@@ -31,6 +31,9 @@ const storage = multer.diskStorage({
         else if (req.body?.type === "notice") {
             filename = `Notice_${req.body.title}_${Date.now()}.pdf`;
         }
+        else if (req.body?.type === "itemsboard") {
+            filename = `Item_${req.body.itemType}_${req.body.title}_${Date.now()}${path.extname(file.originalname)}`;
+        }
         console.log(filename);
 
         cb(null, `${filename}`);

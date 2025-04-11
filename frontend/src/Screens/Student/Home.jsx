@@ -10,8 +10,11 @@ import Attendance from "./Attendance";
 import Resources from "./Resources";
 import AssignmentDashboard from "./AssignmentDashboard";
 import Profile from "./Profile";
+import Todolist from "./todolist";
+import Itemsboard from "./Itemsboard";
+// import Societies from "./societies";
+// import Store from "./store";
 import { Toaster } from "react-hot-toast";
-import Todolist from "./todolist"
 import Sidebar, { SidebarItem } from "../../components/sidebar";
 import {
   User,
@@ -23,7 +26,10 @@ import {
   Book,
   CheckSquare,
   Archive,
-  ListTodo
+  ListTodo,
+  PackageSearch,
+  Network,
+  ShoppingBag
 } from "lucide-react";
 
 const Home = () => {
@@ -34,6 +40,7 @@ const Home = () => {
   const [branch, setBranch] = useState("");
   const [semester, setSemester] = useState(0);
   const [studentid , setStudentid] = useState("");
+
   useEffect(() => {
     if (router.state === null) {
       navigate("/");
@@ -108,18 +115,39 @@ const Home = () => {
                 active={selectedMenu === "todolist"}
                 onClick={() => setSelectedMenu("todolist")}
               />
+              <SidebarItem
+                icon={<PackageSearch  size={20} />}
+                text="Lost Found MarketPlace"
+                active={selectedMenu === "Itemsboard"}
+                onClick={() => setSelectedMenu("Itemsboard")}
+              />
+              {/* <SidebarItem
+                icon={<Network  size={20} />}
+                text="Societies"
+                active={selectedMenu === "Societies"}
+                onClick={() => setSelectedMenu("Societies")}
+              />
+              <SidebarItem
+                icon={<ShoppingBag  size={20} />}
+                text="Store"
+                active={selectedMenu === "store"}
+                onClick={() => setSelectedMenu("store")}
+              /> */}
             </Sidebar>
             <div className="flex-1">
               <div className="max-w-6xl mx-auto py-4 px-6">
                 {selectedMenu === "Timetable" && <Timetable />}
                 {selectedMenu === "Marks" && <Marks />}
                 {selectedMenu === "Material" && <Material />}
+                {selectedMenu === "todolist" && <Todolist studentid = {studentid}/>}
                 {selectedMenu === "Notice" && <Notice branch={branch} semester={semester}/>}
                 {selectedMenu === "Curriculum" && <Curriculum />}
                 {selectedMenu === "My Profile" && <Profile setBranch = {setBranch} setSemester = {setSemester} setStudentid = {setStudentid}/>}
                 {selectedMenu === "Attendance" && <Attendance />}
+                {/* {selectedMenu === "store" && <Store />} */}
+                {/* {selectedMenu === "Societies" && <Societies />} */}
+                {selectedMenu === "Itemsboard" && <Itemsboard />}
                 {selectedMenu === "Resources" && <Resources />}
-                {selectedMenu === "todolist" && <Todolist studentid = {studentid}/>}
                 {selectedMenu === "Assignment" && <AssignmentDashboard />}
               </div>
             </div>

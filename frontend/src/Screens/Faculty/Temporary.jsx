@@ -4,9 +4,13 @@ import Heading from "../../components/Heading";
 import { baseApiURL } from "../../baseUrl";
 import toast from "react-hot-toast";
 
-const TemporaryAccess = (prop) => {
+const TemporaryAccess = (props) => {
     const [userEmail, setUserEmail] = useState("");
     const [tempPassword, setTempPassword] = useState("");
+    const [selectedTabs, setSelectedTabs] = useState([]);
+    const availableTabs = [
+        "Notice", "Material", "Upload Marks", "Assignment", "Attendance", "Student Info", "Curriculum", "Timetable"
+    ];
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -21,8 +25,9 @@ const TemporaryAccess = (prop) => {
 
         try {
             const response = await axios.put(`${baseApiURL()}/faculty/auth/update-temporary`, {
-                id: prop.employeeid,
+                id: props.employeeid,
                 email: userEmail,
+                selected_tabs: selectedTabs,
             });
             
 
@@ -39,13 +44,13 @@ const TemporaryAccess = (prop) => {
         setLoading(false);
     };
 
-    if (prop.temporary) return null;
+    if (props.temporary) return null;
 
     return (
         <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10">
             <Heading title="Grant Temporary Faculty Access" />
             <br />
-            <div className="flex justify-between items-center w-full">
+            <div className=" justify-between items-center w-full">
                 <div className="w-[40%] mb-4">
                     <label htmlFor="email" className="leading-7 text-sm ">
                         Enter Temporary User Email
@@ -58,6 +63,27 @@ const TemporaryAccess = (prop) => {
                         className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                     />
                 </div>
+                <div className="w-[40%] mb-4">
+                    <label className="leading-7 text-sm">Select Tabs to Grant Access</label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {availableTabs.map((tab) => (
+                        <label key={tab} className="flex items-center space-x-2">
+                            <input
+                            type="checkbox"
+                            value={tab}
+                            onChange={(e) => {
+                                const updatedTabs = e.target.checked
+                                ? [...selectedTabs, tab]
+                                : selectedTabs.filter(t => t !== tab);
+                                setSelectedTabs(updatedTabs);
+                            }}
+                            />
+                            <span>{tab}</span>
+                        </label>
+                        ))}
+                    </div>
+                </div>
+
             </div>
 
             <button 
