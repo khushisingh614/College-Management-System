@@ -12,6 +12,7 @@ app.use(cors({
 
 //file upload routes come before JSON body parsing (for multer to work with multipart formdata)
 app.use("/api/assignments", require("./routes/Other Api/assignments.route"));
+app.use("/api/quiz", require("./routes/Other Api/quiz.route"));
 
 app.use(express.json()); //to convert request data to json
 
@@ -44,6 +45,7 @@ app.use("/api/forum", require("./routes/Other Api/forum.route"));
 app.use("/api/notify-security" , require("./routes/Other Api/notifysecurity.route"));
 app.use("/api/attendance" , require("./routes/Other Api/attendance.route"));
 
+//makeApicalls();
 app.listen(port, () => {
   console.log(`Server Listening On http://localhost:${port}`);
 });

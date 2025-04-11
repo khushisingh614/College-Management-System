@@ -14,6 +14,7 @@ import AssignmentDashboard from "./AssignmentDashboard";
 import Attendance from "./Attendance";
 import UploadAssignment from "./UploadAssignment";
 import ForumPage from "./ForumPage";
+import Quiz from "./Quiz";
 
 const Home = () => {
   const router = useLocation();
@@ -146,6 +147,16 @@ const Home = () => {
                </li>
                <li
                  className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
+                   selectedMenu === "Quiz"
+                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
+                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
+                 }`}
+                 onClick={() => setSelectedMenu("Quiz")}
+               >
+                 Generate Quiz
+               </li>
+               <li
+                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                    selectedMenu === "Attendance"
                      ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
                      : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
@@ -166,6 +177,7 @@ const Home = () => {
             {selectedMenu === "Student Info" && <Student />}
             {selectedMenu === "Assignment" && <AssignmentDashboard />}
             {selectedMenu === "DiscussionForum" && <ForumPage />}
+            {selectedMenu === "Quiz" && <Quiz />}
           </div>
         </>
         </div>
