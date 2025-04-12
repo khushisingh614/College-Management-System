@@ -12,7 +12,9 @@ const transporter = nodemailer.createTransport({
 
 const getDetails = async (req, res) => {
     try {
+      
         let user = await facultyDetails.find(req.body);
+       
         if (!user) {
             return res
                 .status(400)
@@ -136,4 +138,4 @@ const getCount = async (req, res) => {
     }
 }
 
-module.exports = { getDetails, addDetails, updateDetails, deleteDetails, getCount }
+ module.exports = { getDetails, addDetails, updateDetails, deleteDetails, getCount }

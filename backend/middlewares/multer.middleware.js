@@ -26,7 +26,13 @@ const storage = multer.diskStorage({
             filename = `Assignment_${req.body.title}_Subject_${req.body.subject}_${Date.now()}.pdf`;
         } 
         else if (req.body?.type === "submitassignments") {
-            filename = `Submit_Assignment_by_${req.body.studentName}_${Date.now()}${path.extname(file.originalname)}`;
+            filename = `Submit_Assignment_by_${req.body.studentName}_${Date.now()}${path.extname(file.originalname)}`;;
+        } 
+        else if (req.body?.type === "notice") {
+            filename = `Notice_${req.body.title}_${Date.now()}.pdf`;
+        }
+        else if (req.body?.type === "itemsboard") {
+            filename = `Item_${req.body.itemType}_${req.body.title}_${Date.now()}${path.extname(file.originalname)}`;
         }
         else if (req.body?.type === "quiz") {
             filename = `Quiz_Material_for_${req.body.subject}_by_${req.body.facultyId}_${Date.now()}${path.extname(file.originalname)}`;

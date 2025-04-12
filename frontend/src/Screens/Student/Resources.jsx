@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaComments, FaHeadset, FaHospital, FaGraduationCap, FaBrain, FaPhone } from "react-icons/fa";
-
+import Heading from "../../components/Heading";
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState(null);
@@ -20,6 +20,8 @@ const Dashboard = () => {
 
   return (
     <div className="container mt-4">
+      <Heading title="Resources and Student Facilities"/>
+      <br />
       <div className="row g-4">
         {options.map((option) => (
           <div key={option.key} className="col-md-4">

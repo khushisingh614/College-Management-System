@@ -60,7 +60,7 @@ const Login = () => {
             setTemporary(true);
             toast.success("Temporary login successful!");
             navigate(`/${selected.toLowerCase()}`, {
-              state: { type: selected, loginid: response.data.loginid , temporary: true },
+              state: { type: selected, loginid: response.data.loginid , temporary: true, selected_tabs: response.data.selected_tabs },
             });
           } else {
             toast.success("Password verified! OTP sent.");

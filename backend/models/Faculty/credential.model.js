@@ -21,6 +21,10 @@ const facultyCredential = new mongoose.Schema({
     type: Date,
     default: null,
     expires: 3600,
+  },
+  temporary_selected_tabs:{
+    type: [String],
+    default: null,
   }
 
 }, { timestamps: true });

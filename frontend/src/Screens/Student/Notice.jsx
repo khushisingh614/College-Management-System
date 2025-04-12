@@ -1,61 +1,80 @@
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { baseApiURL } from "../../baseUrl";
-// import toast from "react-hot-toast";
+import React, { useEffect, useState } from "react";
+import Heading from "../../components/Heading";
+import axios from "axios";
+import { IoMdLink } from "react-icons/io";
+import { HiOutlineCalendar } from "react-icons/hi";
+import { baseApiURL } from "../../baseUrl";
+import toast from "react-hot-toast";
 
-// const Notice = () => {
-//   const [notices, setNotices] = useState([]);
-//   const [loading, setLoading] = useState(true);
+const NoticeStudentView = (prop) => {
+  const [notice, setNotice] = useState([]);
 
-//   useEffect(() => {
-//     fetchNotices();
-//   }, []);
+  const getNoticeHandler = () => {
+    const headers = { "Content-Type": "application/json" };
+    const query = {
+      forwhom: ["student", "both"],
+      branch: prop.branch,
+      semester: prop.semester,
+    };
 
-//   const fetchNotices = () => {
-//     setLoading(true);
-//     axios
-//       .get(`${baseApiURL()}/notice/getAll`)
-//       .then((response) => {
-//         if (response.data.success) {
-//           setNotices(response.data.notices || []);
-//         } else {
-//           toast.error(response.data.message);
-//         }
-//       })
-//       .catch((error) => {
-//         toast.error("Error fetching notices");
-//         console.error(error);
-//       })
-//       .finally(() => setLoading(false));
-//   };
+    axios
+      .post(`${baseApiURL()}/notice/getNoticebybranchandsem`, {
+        headers,
+        data: query,
+      })
+      .then((response) => {
+        if (response.data.success) {
+          setNotice(response.data.notice);
+        } else {
+          toast.error(response.data.message);
+        }
+      })
+      .catch((error) => {
+        toast.error(error.response?.data?.message || "Error fetching notices");
+      });
+  };
 
-//   return (
-//     <div className="w-[70%] mx-auto mt-10">
-//       <h2 className="text-2xl font-semibold mb-4">All Notices</h2>
+  useEffect(() => {
+    getNoticeHandler();
+  }, []);
 
-//       {loading ? (
-//         <p className="text-center text-gray-600">Loading notices...</p>
-//       ) : notices.length === 0 ? (
-//         <p className="text-center text-gray-600">No notices found.</p>
-//       ) : (
-//         <div className="flex flex-col gap-6">
-//           {notices.map((notice) => (
-//             <div key={notice._id} className="bg-blue-50 p-6 rounded-lg shadow-md relative">
-//               <h3 className="text-xl font-semibold">{notice.title}</h3>
-//               <p className="text-gray-700 mt-2">{notice.content}</p>
-//               <p className="text-sm text-gray-600 mt-2">
-//                 Issued by: {notice.issuedByAdmin
-//                   ? `${notice.issuedByAdmin?.firstName || ""} ${notice.issuedByAdmin?.lastName || ""}`.trim()
-//                   : notice.issuedByFaculty
-//                     ? `${notice.issuedByFaculty?.firstName || ""} ${notice.issuedByFaculty?.lastName || ""}`.trim()
-//                     : "Unknown"} {"    "} | {new Date(notice.createdAt).toLocaleDateString()}
-//               </p>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
+  return (
+    <div className="w-full mx-auto flex justify-center items-start flex-col my-10">
+      <Heading title="Student Notices" />
+      <div className="mt-8 w-full">
+        {notice.length === 0 && (
+          <p className="text-gray-500 text-center">No notices available.</p>
+        )}
+        {notice.map((item) => (
+          <div
+            key={item._id}
+            className="border-blue-500 border-2 w-full rounded-md shadow-sm py-4 px-6 mb-4 relative"
+          >
+            <p
+              className={`text-xl font-medium flex justify-start items-center ${
+                item.link && "cursor-pointer"
+              } group`}
+              onClick={() => item.link && window.open(process.env.REACT_APP_MEDIA_LINK + "/" + item.link)}
+            >
+              {item.title}
+              {item.link && (
+                <span className="text-2xl group-hover:text-blue-500 ml-1">
+                  <IoMdLink />
+                </span>
+              )}
+            </p>
+            <p className="text-base font-normal mt-1">{item.description}</p>
+            <p className="text-sm absolute top-4 right-4 flex items-center">
+              <span className="text-base mr-1">
+                <HiOutlineCalendar />
+              </span>
+              {new Date(item.createdAt).toLocaleString()}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
-// export default Notice;
+export default NoticeStudentView;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
-import Notice from "../../components/Notice";
+import Notice from "./Notice";
 import Profile from "./Profile";
 import Timetable from "./Timetable";
 import { Toaster } from "react-hot-toast";
@@ -11,8 +11,24 @@ import Marks from "./Marks";
 import Student from "./Student";
 import Temporary from "./Temporary";
 import AssignmentDashboard from "./AssignmentDashboard";
-import Attendance from "./Attendance";
 import UploadAssignment from "./UploadAssignment";
+import Attendance from "./Attendance";
+import Sidebar, { SidebarItem } from "../../components/sidebar";
+import {
+  User,
+  Calendar,
+  Bell,
+  Book,
+  Key,
+  Users,
+  Clipboard,
+  BookOpen,
+  FileText,
+  CheckSquare,
+  MessagesSquare,
+  HelpCircle
+} from "lucide-react";
+
 import ForumPage from "./ForumPage";
 import Quiz from "./Quiz";
 
@@ -21,10 +37,29 @@ const Home = () => {
   const navigate = useNavigate();
   const [selectedMenu, setSelectedMenu] = useState("My Profile");
   const [load, setLoad] = useState(false);
-  const [employeeid , setemployeeid] = useState("");
+  const [employeeid, setemployeeid] = useState("");
   const [temporary, setTemporary] = useState(false);
+  const [branch, setBranch] = useState("");
+  const [selectedTabs, setSelectedTabs] = useState([]);
+
+  const allTabs = [
+    { key: "My Profile", icon: <User size={20} /> },
+    { key: "Timetable", icon: <Calendar size={20} /> },
+    { key: "Notice", icon: <Bell size={20} /> },
+    { key: "Material", icon: <Book size={20} /> },
+    { key: "Temporary_Access", icon: <Key size={20} /> },
+    { key: "Student Info", icon: <Users size={20} /> },
+    { key: "Upload Marks", icon: <Clipboard size={20} /> },
+    { key: "Curriculum", icon: <BookOpen size={20} /> },
+    { key: "Assignment", icon: <FileText size={20} /> },
+    { key: "Attendance", icon: <CheckSquare size={20} /> },
+    { key: "Quiz", icon: <HelpCircle size={20} /> },
+    { key: "DiscussionForum", icon: <MessagesSquare size={20} /> },
+  ];
+  
+
   useEffect(() => {
-    if (router.state === null) {
+    if (!router.state) {
       navigate("/");
     }
     setLoad(true);
@@ -33,153 +68,64 @@ const Home = () => {
   return (
     <section>
       {load && (
-         <div className="bg-[#E8F9FF] min-h-screen">
-        <>
+        <div className="flex bg-[#E8F9FF] min-h-screen flex flex-col overflow-visible">
+          
+
           <Navbar />
-          <div className="max-w-6xl mx-auto">
-            <ul className="flex justify-evenly items-center font-bold gap-10 w-full mx-auto my-4">
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "My Profile"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
-                onClick={() => setSelectedMenu("My Profile")}
-              >
-                My Profile
-              </li>
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Timetable"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
-                onClick={() => setSelectedMenu("Timetable")}
-              >
-                Timetable
-              </li>
-              
-              
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Notice"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
-                onClick={() => setSelectedMenu("Notice")}
-              >
-                Notice
-              </li>
-              
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Material"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
-                onClick={() => setSelectedMenu("Material")}
-              >
-                Material
-              </li>
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/4 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Temporary_Access"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
-                onClick={() => setSelectedMenu("Temporary_Access")}
-              >
-                Temporary Access
-              </li>
-            </ul>
-            <ul className="flex justify-evenly font-bold items-center gap-5 w-full mx-auto my-4">
-            <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Student Info"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
-                onClick={() => setSelectedMenu("Student Info")}
-              >
-                Student Info
-              </li>
-              
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Upload Marks"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
-                onClick={() => setSelectedMenu("Upload Marks")}
-              >
-                Upload Marks
-              </li>
-              <li
-                className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                  selectedMenu === "Curriculum"
-                    ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                }`}
-                onClick={() => setSelectedMenu("Curriculum")}
-              >
-                Curriculum
-              </li>
-              
-              <li
-                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                   selectedMenu === "Assignment"
-                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                 }`}
-                 onClick={() => setSelectedMenu("Assignment")}
-               >
-                 Assignment
-               </li>
-               <li
-                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                   selectedMenu === "DiscussionForum"
-                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                 }`}
-                 onClick={() => setSelectedMenu("DiscussionForum")}
-               >
-                 DiscussionForum
-               </li>
-               <li
-                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                   selectedMenu === "Quiz"
-                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                 }`}
-                 onClick={() => setSelectedMenu("Quiz")}
-               >
-                 Generate Quiz
-               </li>
-               <li
-                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
-                   selectedMenu === "Attendance"
-                     ? "border-b-2 pb-2 border-white text-white bg-[#183B4E] rounded-sm"
-                     : "bg-[#A1E3F9] text-[#3E3F5B] hover:bg-[#27548A] hover:text-white border-b-2 border-white"
-                 }`}
-                 onClick={() => setSelectedMenu("Attendance")}
-               >
-                 Attendance
-               </li>
-            </ul>
-            {selectedMenu === "Timetable" && <Timetable />}
-            {selectedMenu === "Upload Marks" && <Marks />}
-            {selectedMenu === "Material" && <Material />}
-            {selectedMenu === "Attendance" && <Attendance />}
-            {selectedMenu === "Notice" && <Notice />}
-            {selectedMenu === "My Profile" && <Profile setemployeeid={setemployeeid} setTemporary = {setTemporary}/>}
-            {selectedMenu === "Curriculum" && <Curriculum />}
-            {selectedMenu === "Temporary_Access" && <Temporary  employeeid={employeeid} temporary={temporary} />}
-            {selectedMenu === "Student Info" && <Student />}
-            {selectedMenu === "Assignment" && <AssignmentDashboard />}
-            {selectedMenu === "DiscussionForum" && <ForumPage />}
-            {selectedMenu === "Quiz" && <Quiz />}
+          <div className="flex flex-1 overflow-visible">
+          <Sidebar>
+            {temporary ? (
+              selectedTabs.push("My Profile"),
+              allTabs    
+                .filter(tab => selectedTabs.includes(tab.key))
+                .map(tab => (
+                  <SidebarItem
+                    key={tab.key}
+                    icon={tab.icon}
+                    text={tab.key}
+                    active={selectedMenu === tab.key}
+                    onClick={() => setSelectedMenu(tab.key)}
+                  />
+                ))
+            ) : (
+              allTabs.map(tab => (
+                <SidebarItem
+                  key={tab.key}
+                  icon={tab.icon}
+                  text={tab.key}
+                  active={selectedMenu === tab.key}
+                  onClick={() => setSelectedMenu(tab.key)}
+                />
+              ))
+            )}
+          </Sidebar>
+
+            <div className="flex-1">
+              <div className="max-w-6xl mx-auto py-4 px-6">
+                {selectedMenu === "Timetable" && <Timetable />}
+                {selectedMenu === "Upload Marks" && <Marks />}
+                {selectedMenu === "Material" && <Material />}
+                {selectedMenu === "Attendance" && <Attendance />}
+                {selectedMenu === "Notice" && <Notice branch={branch}/>}
+                {selectedMenu === "My Profile" && (
+                  <Profile
+                    setemployeeid={setemployeeid}
+                    setTemporary={setTemporary}
+                    setBranch = {setBranch}
+                    setSelectedTabs = {setSelectedTabs}
+                  />
+                )}
+                {selectedMenu === "Curriculum" && <Curriculum />}
+                {selectedMenu === "Temporary_Access" && (
+                  <Temporary employeeid={employeeid} temporary={temporary} />
+                )}
+                {selectedMenu === "Student Info" && <Student />}
+                {selectedMenu === "Assignment" && <AssignmentDashboard />}
+                {selectedMenu === "DiscussionForum" && <ForumPage />}
+                {selectedMenu === "Quiz" && <Quiz />}
+              </div>
+            </div>
           </div>
-        </>
         </div>
       )}
       <Toaster position="bottom-center" />

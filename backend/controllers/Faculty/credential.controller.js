@@ -42,6 +42,7 @@ const loginHandler = async (req, res) => {
           {
             temporary_password: null,
             temporary_password_expires_at: null,
+            temporary_selected_tabs: [],
           }
         );
         return res
@@ -54,6 +55,7 @@ const loginHandler = async (req, res) => {
         message: "Temporary",
         loginid: user.loginid,
         id: user.id,
+        selected_tabs: user.temporary_selected_tabs,
       });
     }
 
@@ -170,6 +172,7 @@ const updateTemporaryHandler = async (req, res) => {
     await facultyCredential.findOneAndUpdate({loginid: req.body.id}, {
         temporary_password: tempPassword,
         temporary_password_expires_at: new Date(Date.now() + 60 * 60 * 1000),
+        temporary_selected_tabs: req.body.selected_tabs,
     });
     
     const mailOptions = {

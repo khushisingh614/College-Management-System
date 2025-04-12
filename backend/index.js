@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const path = require("path")
 connectToMongo();
+require("./utils/cleanupTodo");
 const port = 5000 || process.env.PORT;
 var cors = require("cors");
 require('./sendDeadlineMails');
@@ -27,6 +28,7 @@ app.use('/media', express.static(path.join(__dirname, 'media')));
 app.use("/api/student/auth", require("./routes/Student Api/credential.route"));
 app.use("/api/faculty/auth", require("./routes/Faculty Api/credential.route"));
 app.use("/api/admin/auth", require("./routes/Admin Api/credential.route"));
+
 // Details Apis
 app.use("/api/student/details", require("./routes/Student Api/details.route"));
 app.use("/api/faculty/details", require("./routes/Faculty Api/details.route"));
@@ -44,8 +46,8 @@ app.use("/api/forum", require("./routes/Other Api/forum.route"));
 
 app.use("/api/notify-security" , require("./routes/Other Api/notifysecurity.route"));
 app.use("/api/attendance" , require("./routes/Other Api/attendance.route"));
-
-//makeApicalls();
+app.use("/api/todo" , require("./routes/Other Api/todolist.route"));
+app.use("/api/itemsboard" , require("./routes/Other Api/itemsboard.route"));
 app.listen(port, () => {
   console.log(`Server Listening On http://localhost:${port}`);
 });

@@ -9,11 +9,18 @@ const Notice = new mongoose.Schema({
     type: String,
     required: true,
   },
-  type: {
+  forwhom: {
     type: String,
   },
   link: {
     type: String,
+  },
+  branch: {
+    type: [String],
+    required: true,
+  },
+  semester: {
+    type: [Number],
   }
 }, { timestamps: true });
 
