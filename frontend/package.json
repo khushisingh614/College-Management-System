@@ -42,7 +42,6 @@
     "workbox-routing": "^7.3.0",
     "workbox-strategies": "^7.3.0",
     "xlsx": "^0.18.5"
-
   },
   "scripts": {
     "start": "react-scripts start",

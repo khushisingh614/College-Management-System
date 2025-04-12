@@ -110,7 +110,7 @@ const Profile = (props) => {
 
   return (
     <div>
-    <div className="max-w-4xl mx-auto mt-10 p-8 bg-gradient-to-r from-[#27548A] to-[#410445] shadow-xl rounded-lg text-white font-poppins">
+    <div className="max-w-4xl mx-auto p-8 bg-gradient-to-r from-[#27548A] to-[#410445] shadow-xl rounded-lg text-white font-poppins">
   {data && (
     <>
       <div className="flex items-center gap-8">
@@ -190,8 +190,8 @@ const Profile = (props) => {
       )}
     </>
   )}
-  <img src=""/>
 </div>
+<img src="/profile_img1.jpg" className="mt-4 w-full h-[560px] object-cover"/>
 </div>
   );
 };
