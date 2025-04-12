@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { getDetails, getStudentsBySubject,addDetails, updateDetails, deleteDetails, getCount } = require("../../controllers/Student/details.controller.js");
+const { getDetails,getDetailsofmarks, getStudentsBySubject,addDetails, updateDetails, deleteDetails, getCount } = require("../../controllers/Student/details.controller.js");
 const upload = require("../../middlewares/multer.middleware.js")
 
 router.post("/getDetails", getDetails);
+
+router.post("/getDetailsofmarks", getDetailsofmarks);
 
 router.get("/getStudentsBySubject/:subjectId", getStudentsBySubject);
 
