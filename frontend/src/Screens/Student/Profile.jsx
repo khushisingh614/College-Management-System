@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import { setUserData } from "../../redux/actions";
 import { baseApiURL } from "../../baseUrl";
 import toast from "react-hot-toast";
+import Analytics from "./Analytics";
 const Profile = (props) => {
   const [showPass, setShowPass] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

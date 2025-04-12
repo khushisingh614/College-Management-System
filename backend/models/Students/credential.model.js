@@ -13,6 +13,10 @@ const studentCredential = new mongoose.Schema({
     type: String, 
     required: true 
   },
+  primaryDeviceId: { 
+    type: String, 
+    default: null 
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Student Credential", studentCredential);

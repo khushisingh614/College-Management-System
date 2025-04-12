@@ -25,6 +25,10 @@ const facultyCredential = new mongoose.Schema({
   temporary_selected_tabs:{
     type: [String],
     default: null,
+  },
+  primaryDeviceId: { 
+    type: String, 
+    default: null 
   }
 
 }, { timestamps: true });

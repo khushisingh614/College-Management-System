@@ -1,7 +1,7 @@
 const studentDetails = require("../../models/Students/details.model.js")
 const nodemailer = require("nodemailer");
 const Subject = require("../../models/Other/subject.model");
-
+const Mark = require("../../models/Other/marks.model.js");
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -30,7 +30,46 @@ const getDetails = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
+const getDetailsofmarks = async (req, res) => {
+    try {
+        const { branch, semester, subject, examType } = req.body;
 
+        let students = await studentDetails.find({ branch, semester });
+
+        if (!students || students.length === 0) {
+            return res.status(400).json({ success: false, message: "No Students Found" });
+        }
+
+        const enrollmentNos = students.map((s) => s.enrollmentNo);
+
+        const marks = await Mark.find({
+            enrollmentNo: { $in: enrollmentNos }
+        });
+
+        // Create a map of marks for quick lookup
+        const marksMap = {};
+        marks.forEach((mark) => {
+            marksMap[mark.enrollmentNo] = mark[examType] ? mark[examType][subject] : null;
+        });
+
+        const studentWithMarks = students.map((student) => {
+            return {
+                ...student.toObject(),
+                existingMarks: marksMap[student.enrollmentNo] || null,
+            };
+        });
+
+        const data = {
+            success: true,
+            message: "Student Details Found!",
+            user: studentWithMarks,
+        };
+        res.json(data);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
 const addDetails = async (req, res) => {
     try {
         let user = await studentDetails.findOne({
@@ -154,4 +193,4 @@ const getCount = async (req, res) => {
     }
 }
 
-module.exports = { getDetails,getStudentsBySubject, addDetails, updateDetails, deleteDetails, getCount }
+module.exports = { getDetails,getDetailsofmarks, getStudentsBySubject, addDetails, updateDetails, deleteDetails, getCount }

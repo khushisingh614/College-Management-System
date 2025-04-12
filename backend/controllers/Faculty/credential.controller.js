@@ -19,6 +19,7 @@ const transporter = nodemailer.createTransport({
 
 const loginHandler = async (req, res) => {
   let { loginid, password } = req.body;
+  const deviceId = req.headers['x-device-id'];
   try {
     let user = await facultyCredential.findOne({ loginid });
     if (!user) {
@@ -64,12 +65,33 @@ const loginHandler = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Wrong Credentials" });
     }
+    let faculty = await facultyData.findOne({ employeeId: loginid }).exec();
 
+    if (!user.primaryDeviceId) {
+      user.primaryDeviceId = deviceId;
+      await user.save();
+    } else if (user.primaryDeviceId !== deviceId) {
+      
+      const mail = {
+          from: process.env.EMAIL_USER,
+          to: faculty.email,
+          subject:'New Device Login Detected',
+          text: `A new device has been used to log into your account.\nIf this wasn't you, please reset your password immediately.`,
+      };
+
+      transporter.sendMail(mail, (error) => {
+          if (error) {
+              console.log(error);
+          } else {
+              console.log("New device notification email sent.");
+          }
+      });
+    }
     // Generate OTP
     const otp = crypto.randomInt(100000, 999999).toString();
     otpStore[loginid] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // OTP expires in 5 minutes
 
-    let faculty = await facultyData.findOne({ employeeId: loginid }).exec();
+    
 
     // Send OTP via email
     const mailOptions = {

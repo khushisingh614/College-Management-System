@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FiLogIn } from "react-icons/fi";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { baseApiURL } from "../baseUrl";
-
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 const Login = () => {
   const bgImage ="/clg.jpg";
   const navigate = useNavigate();
@@ -20,7 +20,17 @@ const Login = () => {
   const [loginid , setLoginid] = useState(0);
 
   const [userEmail , setUserEmail] = useState("");
-
+  const [deviceId, setDeviceId] = useState(null);
+  useEffect(() => {
+    // Initialize FingerprintJS and get the visitor identifier
+    const loadFingerprint = async () => {
+      const fp = await FingerprintJS.load();
+      const result = await fp.get();
+      setDeviceId(result.visitorId);
+    };
+  
+    loadFingerprint();
+  }, []);
   const fetchUserEmail = async (loginid) => {
     try {
       if (!loginid) return; 
@@ -48,6 +58,7 @@ const Login = () => {
     if (data.loginid !== "" && data.password !== "") {
       const headers = {
         "Content-Type": "application/json",
+        "x-device-id": deviceId,
       };
       axios
         .post(`${baseApiURL()}/${selected.toLowerCase()}/auth/login`, data, {

@@ -4,6 +4,7 @@ import Heading from "../../components/Heading";
 import toast from "react-hot-toast";
 import { BiArrowBack } from "react-icons/bi";
 import { baseApiURL } from "../../baseUrl";
+import * as XLSX from "xlsx";
 
 const Marks = () => {
   const [subject, setSubject] = useState();
@@ -21,8 +22,9 @@ const Marks = () => {
     };
     axios
       .post(
-        `${baseApiURL()}/student/details/getDetails`,
-        { branch: selected.branch, semester: selected.semester },
+        `${baseApiURL()}/student/details/getDetailsofmarks`,
+        { branch: selected.branch, semester: selected.semester, subject: selected.subject,
+          examType: selected.examType, },
         { headers }
       )
       .then((response) => {
@@ -36,6 +38,31 @@ const Marks = () => {
         console.error(error);
         toast.error(error.message);
       });
+  };
+
+  const downloadExcelHandler = () => {
+    if (!studentData || studentData.length === 0) {
+      toast.error("No student data available to download");
+      return;
+    }
+
+    const examType = selected.examType;
+    const subject = selected.subject;
+
+    // Construct rows for Excel
+    const data = studentData.map((student) => ({
+      EnrollmentNo: student.enrollmentNo,
+      Name: student.firstName + " " + student.lastName || "-", // If you have name in student object
+      [subject + " - " + examType]: student.existingMarks ?? "Not Available",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Marks");
+
+    const filename = `${selected.branch}_Sem${selected.semester}_${subject}_${examType}_Marks.xlsx`;
+    XLSX.writeFile(workbook, filename);
   };
 
   const submitMarksHandler = () => {
@@ -271,6 +298,7 @@ const Marks = () => {
                     className="px-6 py-2 focus:ring-0 outline-none w-1/2"
                     placeholder="Enter Marks"
                     id={`${student.enrollmentNo}marks`}
+                    defaultValue={student.existingMarks !== null ? student.existingMarks : ""}
                   />
                 </div>
               );
@@ -281,6 +309,13 @@ const Marks = () => {
             onClick={submitMarksHandler}
           >
             Upload Student Marks
+          </button>
+
+          <button
+            className="bg-green-500 px-6 py-3 mt-4 mx-auto rounded text-white"
+            onClick={downloadExcelHandler}
+          >
+            Download Excel
           </button>
         </>
       )}

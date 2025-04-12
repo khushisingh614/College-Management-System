@@ -14,6 +14,10 @@ const adminCredential = new mongoose.Schema(
       type: String, 
       required: true,
     },
+    primaryDeviceId: { 
+      type: String, 
+      default: null 
+    }
   },
   { timestamps: true }
 );
