@@ -54,7 +54,7 @@ const QuizList = () => {
         {quizzes.map((quiz) => (
           <div
             key={quiz._id}
-            className="border p-4 rounded shadow hover:bg-gray-50 cursor-pointer"
+            className="border p-4 rounded bg-yellow-300 shadow hover:bg-gray-100 cursor-pointer"
             onClick={() => setSelectedQuizId(quiz._id)}
           >
             <h3 className="text-lg font-semibold">{quiz.title}</h3>
@@ -67,7 +67,7 @@ const QuizList = () => {
         {completedquizzes.map((quiz) => (
           <div
             key={quiz._id}
-            className="border p-4 rounded shadow hover:bg-gray-50 cursor-pointer"
+            className="border p-4 rounded bg-green-300  shadow hover:bg-gray-100 cursor-pointer"
             onClick={() => setSelectedCompletedQuizId(quiz._id)}
           >
             <h3 className="text-lg font-semibold">{quiz.title}</h3>

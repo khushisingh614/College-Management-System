@@ -104,155 +104,155 @@ const StudentItemsBoard = ({ studentid }) => {
   };
 
   return (
-    <div className="w-full mx-auto mt-10 flex flex-col items-center mb-10">
-      <Heading title="Lost & Found / Marketplace" />
-      
-      {/* Tabs */}
-      <div className="flex justify-center space-x-4 my-6">
-        {["lost", "found", "marketplace"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-md capitalize ${
-              activeTab === tab ? "bg-indigo-600 text-white" : "bg-gray-100"
-            }`}
+    <div className="w-full max-w-4xl mx-auto mt-10 flex flex-col items-center mb-10">
+  <Heading title="Lost & Found / Marketplace" />
+  
+  {/* Tabs */}
+  <div className="flex justify-center space-x-4 my-6">
+    {["lost", "found", "marketplace"].map((tab) => (
+      <button
+        key={tab}
+        onClick={() => setActiveTab(tab)}
+        className={`px-4 py-2 rounded-md capitalize ${
+          activeTab === tab ? "bg-indigo-600 text-white" : "bg-gray-100"
+        }`}
+      >
+        {tab}
+      </button>
+    ))}
+  </div>
+
+  {/* Add Item Form */}
+  <div className="bg-blue-50 p-4 rounded-md shadow w-full max-w-2xl space-y-4">
+    <input
+      type="text"
+      placeholder="Title"
+      value={formData.title}
+      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+      className="w-full px-3 py-2 border rounded"
+    />
+    <textarea
+      placeholder="Description"
+      value={formData.description}
+      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+      className="w-full px-3 py-2 border rounded"
+    />
+    <input
+      type="text"
+      placeholder="Location"
+      value={formData.location}
+      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+      className="w-full px-3 py-2 border rounded"
+    />
+    <input
+      type="text"
+      placeholder="Mobile Number"
+      value={formData.mobilenumber}
+      onChange={(e) => setFormData({ ...formData, mobilenumber: e.target.value })}
+      className="w-full px-3 py-2 border rounded"
+    />
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageChange}
+      className="w-full"
+    />
+    <button
+      onClick={handleAddItem}
+      className="bg-indigo-600 text-white px-4 py-2 rounded-md w-full flex items-center justify-center gap-2"
+    >
+      <HiOutlinePlus className="text-lg" />
+      Add Item
+    </button>
+  </div>
+
+  {/* Items List */}
+  <div className="w-full max-w-3xl mt-6">
+    {items.length > 0 ? (
+      items
+        .slice()
+        .reverse()
+        .map((item) => (
+          <div
+            key={item._id}
+            className="border rounded-md shadow-sm py-3 px-4 relative mb-4"
           >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* Add Item Form */}
-      <div className="bg-blue-50 p-4 rounded-md shadow w-full max-w-xl">
-        <input
-          type="text"
-          placeholder="Title"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className="w-full mb-2 px-3 py-2 border rounded"
-        />
-        <textarea
-          placeholder="Description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          className="w-full mb-2 px-3 py-2 border rounded"
-        />
-        <input
-          type="text"
-          placeholder="Location"
-          value={formData.location}
-          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-          className="w-full mb-2 px-3 py-2 border rounded"
-        />
-        <input
-            type="text"
-            placeholder="Mobile Number"
-            value={formData.mobilenumber}
-            onChange={(e) => setFormData({ ...formData, mobilenumber: e.target.value })}
-            className="w-full mb-2 px-3 py-2 border rounded"
-            />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="w-full mb-2"
-        />
-        <button
-          onClick={handleAddItem}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-md w-full flex items-center justify-center gap-2"
-        >
-          <HiOutlinePlus className="text-lg" />
-          Add Item
-        </button>
-      </div>
-
-      {/* Items List */}
-      <div className="w-full max-w-xl mt-6">
-        {items.length > 0 ? (
-          items
-            .slice()
-            .reverse()
-            .map((item) => (
-              <div
-                key={item._id}
-                className="border rounded-md shadow-sm py-3 px-4 relative mb-4"
-              >
-                <div className="flex items-start gap-3">
-                  {item.imageUrl && (
-                    <img
-                      src={process.env.REACT_APP_MEDIA_LINK + "/" + item.imageUrl}
-                      alt="item"
-                      className="w-20 h-20 object-cover rounded-md"
+            <div className="flex items-start gap-3">
+              {item.imageUrl && (
+                <img
+                  src={process.env.REACT_APP_MEDIA_LINK + "/" + item.imageUrl}
+                  alt="item"
+                  className="w-20 h-20 object-cover rounded-md"
+                />
+              )}
+              <div className="flex-1">
+                {editItemId === item._id ? (
+                  <>
+                    <input
+                      value={editData.title}
+                      onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                      className="w-full border rounded px-2 py-1 mb-2"
                     />
-                  )}
-                  <div className="flex-1">
-                    {editItemId === item._id ? (
-                      <>
-                        <input
-                          value={editData.title}
-                          onChange={(e) => setEditData({ ...editData, title: e.target.value })}
-                          className="w-full border rounded px-2 py-1 mb-1"
-                        />
-                        <textarea
-                          value={editData.description}
-                          onChange={(e) =>
-                            setEditData({ ...editData, description: e.target.value })
-                          }
-                          className="w-full border rounded px-2 py-1 mb-1"
-                        />
-                        <input
-                          value={editData.location}
-                          onChange={(e) =>
-                            setEditData({ ...editData, location: e.target.value })
-                          }
-                          className="w-full border rounded px-2 py-1"
-                        />
-                        <div className="mt-2 flex gap-3">
-                          <button
-                            onClick={() => handleUpdate(item._id)}
-                            className="text-green-600 font-medium"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditItemId(null);
-                              setEditData({});
-                            }}
-                            className="text-gray-500"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <h3 className="font-semibold">{item.title}</h3>
-                        <p className="text-sm text-gray-700">{item.description}</p>
-                        <p className="text-xs text-gray-400">Location: {item.location}</p>
-                        <p className="text-xs text-gray-400">Mobile: {item.mobilenumber}</p>
-                      </>
-                    )}
-                  </div>
-                  {item.studentId === studentid && (
-                    <div className="absolute top-2 right-2 flex gap-2">
-                      <button onClick={() => startEdit(item)} className="text-blue-500">
-                        <HiOutlinePencil className="text-xl" />
+                    <textarea
+                      value={editData.description}
+                      onChange={(e) =>
+                        setEditData({ ...editData, description: e.target.value })
+                      }
+                      className="w-full border rounded px-2 py-1 mb-2"
+                    />
+                    <input
+                      value={editData.location}
+                      onChange={(e) =>
+                        setEditData({ ...editData, location: e.target.value })
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    />
+                    <div className="mt-2 flex gap-3">
+                      <button
+                        onClick={() => handleUpdate(item._id)}
+                        className="text-green-600 font-medium"
+                      >
+                        Save
                       </button>
-                      <button onClick={() => deleteItem(item._id)} className="text-red-500">
-                        <HiOutlineTrash className="text-xl" />
+                      <button
+                        onClick={() => {
+                          setEditItemId(null);
+                          setEditData({});
+                        }}
+                        className="text-gray-500"
+                      >
+                        Cancel
                       </button>
                     </div>
-                  )}
-                </div>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <p className="text-sm text-gray-700">{item.description}</p>
+                    <p className="text-xs text-gray-400">Location: {item.location}</p>
+                    <p className="text-xs text-gray-400">Mobile: {item.mobilenumber}</p>
+                  </>
+                )}
               </div>
-            ))
-        ) : (
-          <p className="text-center text-gray-500">No items listed in this section.</p>
-        )}
-      </div>
-    </div>
-  );
+              {item.studentId === studentid && (
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <button onClick={() => startEdit(item)} className="text-blue-500">
+                    <HiOutlinePencil className="text-xl" />
+                  </button>
+                  <button onClick={() => deleteItem(item._id)} className="text-red-500">
+                    <HiOutlineTrash className="text-xl" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ))
+    ) : (
+      <p className="text-center text-gray-500">No items listed in this section.</p>
+    )}
+  </div>
+</div>
+  )
 };
 
 export default StudentItemsBoard;

@@ -39,41 +39,43 @@ const NoticeStudentView = (prop) => {
   }, []);
 
   return (
-    <div className="w-full mx-auto flex justify-center items-start flex-col my-10">
-      <Heading title="Student Notices" />
-      <div className="mt-8 w-full">
-        {notice.length === 0 && (
-          <p className="text-gray-500 text-center">No notices available.</p>
-        )}
-        {notice.map((item) => (
-          <div
-            key={item._id}
-            className="border-blue-500 border-2 w-full rounded-md shadow-sm py-4 px-6 mb-4 relative"
+    <div className="w-full mx-auto flex justify-center items-start flex-col my-10 bg-white shadow-lg rounded-lg px-10 py-12">
+    <Heading title="Student Notices" />
+    <div className="mt-10 w-full">
+      {notice.length === 0 && (
+        <p className="text-gray-500 text-center">No notices available.</p>
+      )}
+      {notice.map((item) => (
+        <div
+          key={item._id}
+          className="border border-blue-200 rounded-lg shadow-lg p-6 mb-6 bg-white transition-all hover:scale-105 hover:shadow-2xl transform duration-200 mx-2"
+        >
+          <p
+            className={`text-xl font-semibold text-blue-700 flex justify-start items-center cursor-pointer hover:text-blue-600 group`}
+            onClick={() =>
+              item.link &&
+              window.open(process.env.REACT_APP_MEDIA_LINK + "/" + item.link)
+            }
           >
-            <p
-              className={`text-xl font-medium flex justify-start items-center ${
-                item.link && "cursor-pointer"
-              } group`}
-              onClick={() => item.link && window.open(process.env.REACT_APP_MEDIA_LINK + "/" + item.link)}
-            >
-              {item.title}
-              {item.link && (
-                <span className="text-2xl group-hover:text-blue-500 ml-1">
-                  <IoMdLink />
-                </span>
-              )}
-            </p>
-            <p className="text-base font-normal mt-1">{item.description}</p>
-            <p className="text-sm absolute top-4 right-4 flex items-center">
-              <span className="text-base mr-1">
-                <HiOutlineCalendar />
+            {item.title}
+            {item.link && (
+              <span className="ml-2 text-2xl group-hover:text-blue-500">
+                <IoMdLink />
               </span>
-              {new Date(item.createdAt).toLocaleString()}
-            </p>
-          </div>
-        ))}
-      </div>
+            )}
+          </p>
+          <p className="text-base font-normal mt-2">{item.description}</p>
+          <p className="text-xs text-gray-500 absolute top-4 right-4 flex items-center">
+            <span className="mr-1">
+              <HiOutlineCalendar />
+            </span>
+            {new Date(item.createdAt).toLocaleString()}
+          </p>
+        </div>
+      ))}
     </div>
+  </div>
+  
   );
 };
 

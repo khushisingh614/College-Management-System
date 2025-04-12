@@ -48,58 +48,66 @@ const TemporaryAccess = (props) => {
 
     return (
         <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10">
-            <Heading title="Grant Temporary Faculty Access" />
-            <br />
-            <div className=" justify-between items-center w-full">
-                <div className="w-[40%] mb-4">
-                    <label htmlFor="email" className="leading-7 text-sm ">
-                        Enter Temporary User Email
-                    </label>
-                    <input
-                        type="email"
-                        placeholder="Temporary User Email"
-                        value={userEmail}
-                        onChange={(e) => setUserEmail(e.target.value)}
-                        className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-                    />
-                </div>
-                <div className="w-[40%] mb-4">
-                    <label className="leading-7 text-sm">Select Tabs to Grant Access</label>
-                    <div className="grid grid-cols-2 gap-2">
-                        {availableTabs.map((tab) => (
-                        <label key={tab} className="flex items-center space-x-2">
-                            <input
-                            type="checkbox"
-                            value={tab}
-                            onChange={(e) => {
-                                const updatedTabs = e.target.checked
-                                ? [...selectedTabs, tab]
-                                : selectedTabs.filter(t => t !== tab);
-                                setSelectedTabs(updatedTabs);
-                            }}
-                            />
-                            <span>{tab}</span>
-                        </label>
-                        ))}
-                    </div>
-                </div>
+  <Heading title="Grant Temporary Faculty Access" />
+  <br />
+  
+  <div className="w-full flex justify-center items-center mt-8">
+    <div className="w-[40%] bg-white p-8 rounded-lg shadow-md border border-indigo-200">
+      
+      <div className="w-full mb-4">
+        <label htmlFor="email" className="leading-7 text-sm text-indigo-700">
+          Enter Temporary User Email
+        </label>
+        <input
+          type="email"
+          placeholder="Temporary User Email"
+          value={userEmail}
+          onChange={(e) => setUserEmail(e.target.value)}
+          className="w-full bg-indigo-50 rounded border border-indigo-300 focus:border-indigo-500 focus:bg-indigo-100 focus:ring-2 focus:ring-indigo-500 text-base outline-none py-2 px-4 leading-8 transition-colors duration-200 ease-in-out"
+        />
+      </div>
 
-            </div>
-
-            <button 
-                onClick={handleGenerateAccess} 
-                className="mt-6 bg-blue-500 px-6 py-3 text-white"
-                disabled={loading}
-            >
-                {loading ? "Granting Access..." : "Grant Access"}
-            </button>
-
-            {tempPassword && (
-                <p className="mt-4 text-green-600">Temporary Password: {tempPassword}</p>
-            )}
-
-            {error && <p className="mt-4 text-red-600">{error}</p>}
+      <div className="w-full mb-4">
+        <label className="leading-7 text-sm text-indigo-700">Select Tabs to Grant Access</label>
+        <div className="grid grid-cols-2 gap-4">
+          {availableTabs.map((tab) => (
+            <label key={tab} className="flex items-center space-x-2 text-indigo-700">
+              <input
+                type="checkbox"
+                value={tab}
+                onChange={(e) => {
+                  const updatedTabs = e.target.checked
+                    ? [...selectedTabs, tab]
+                    : selectedTabs.filter((t) => t !== tab);
+                  setSelectedTabs(updatedTabs);
+                }}
+                className="focus:ring-indigo-500"
+              />
+              <span>{tab}</span>
+            </label>
+          ))}
         </div>
+      </div>
+
+      <div className="flex justify-center mt-6">
+        <button
+          onClick={handleGenerateAccess}
+          className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-md text-lg transition-colors duration-200"
+          disabled={loading}
+        >
+          {loading ? "Granting Access..." : "Grant Access"}
+        </button>
+      </div>
+
+      {tempPassword && (
+        <p className="mt-4 text-green-600 text-lg">Temporary Password: {tempPassword}</p>
+      )}
+
+      {error && <p className="mt-4 text-red-600 text-lg">{error}</p>}
+    </div>
+  </div>
+</div>
+
     );
 };
 

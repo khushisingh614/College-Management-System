@@ -101,7 +101,7 @@ const Student = () => {
           </button>
         </form>
         {id && (
-          <div className="mx-auto w-full bg-blue-50 mt-10 flex justify-between items-center p-10 rounded-md shadow-md">
+          <div className="mx-auto w-full bg-indigo-200 mt-10 flex justify-between items-center p-10 rounded-md shadow-md">
             <div>
               <p className="text-2xl font-semibold">
                 {data.firstName} {data.middleName} {data.lastName}

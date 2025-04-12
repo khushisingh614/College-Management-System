@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { baseApiURL } from "../../baseUrl";
 import Dashboard from "./AssignmentDashboard";
+import {
+  openDB,
+  getSubmissionsFromDB,
+  deleteSubmissionFromDB,
+  syncSubmissionsToBackend,
+} from "../../utils/sync"; // Adjust the path accordingly
+
 
 const SubmitAssignment = ({id, onClose}) => {
   const assignmentId = id.id;
@@ -24,21 +31,6 @@ const SubmitAssignment = ({id, onClose}) => {
   const dbName = "SubmissionsDatabase";
   const storeName = "submissions";
 
-  const openDB = () => {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(dbName, 5);
-
-      request.onupgradeneeded = (event) => {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains(storeName)) {
-          db.createObjectStore(storeName, { keyPath: "_id", autoIncrement: true });
-        }
-      };
-
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject("Error opening IndexedDB");
-    });
-  };
 
   // Store submissions in IndexedDB (Offline)
   const saveSubmissionToDB = async (submission) => {
@@ -47,62 +39,28 @@ const SubmitAssignment = ({id, onClose}) => {
     submission.forEach((value, key) => {
       submissionobj[key] = value;
     });
-    const db = await openDB();
+    const db = await openDB(dbName,storeName);
     const tx = db.transaction(storeName, "readwrite");
     const store = tx.objectStore(storeName);
     store.put(submissionobj); //saves file,studentName,enrollmentNo,assignmentId,deadline
   };
 
-  // Retrieve submissions from IndexedDB
-  const getSubmissionsFromDB = async () => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(storeName, "readonly");
-      const store = tx.objectStore(storeName);
-      const request = store.getAll();
-
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject("Error retrieving submissions");
-    });
-  };
-
-  // Delete a submission from IndexedDB after syncing
-  const deleteSubmissionFromDB = async (submissionId) => {
-    const db = await openDB();
-    const tx = db.transaction(storeName, "readwrite");
-    const store = tx.objectStore(storeName);
-    store.delete(submissionId);
-  };
-
-  // Sync offline submissions when back online
-  const syncSubmissionsToBackend = async () => {
-    const submissions = await getSubmissionsFromDB();
-
-    for (let submission of submissions) {
-      const formData = new FormData();
-      Object.entries(submission).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
-      try {
-        const response = await axios.post(`${baseApiURL()}/assignments/submit`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        if (response.status === 200) {
-          console.log(`Submission ${submission._id} synced successfully`);
-          await deleteSubmissionFromDB(submission._id);
-        }
-      } catch (error) {
-        console.error(`Failed to sync submission ${submission._id}:`, error);
-      }
-    }
-  };
-
   // Listen for the online event to trigger syncing
   useEffect(() => {
-    window.addEventListener("online", syncSubmissionsToBackend);
-    return () => window.removeEventListener("online", syncSubmissionsToBackend);
+    const handleOnline = () => {
+      console.log("Back online, syncing submissions...");
+      syncSubmissionsToBackend();
+    };
+  
+    // Always check once on component mount
+    if (navigator.onLine) {
+      handleOnline();
+    }
+  
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
   }, []);
+  
 
   // Handle file submission
   const handleUpload = async () => {

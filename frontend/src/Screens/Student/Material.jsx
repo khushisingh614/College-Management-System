@@ -55,86 +55,89 @@ const Material = () => {
   };
 
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10">
-      <Heading title="Material" />
-      <div className="mt-8 w-full flex justify-center items-center flex-col">
-        <div className="flex justify-center items-center w-[40%]">
-          <select
-            value={selected}
-            name="subject"
-            id="subject"
-            onChange={onSelectChangeHandler}
-            className="px-2 bg-blue-50 py-3 rounded-sm text-base accent-blue-700"
-          >
-            <option defaultValue value="select">
-              -- Select Subject --
-            </option>
-            {subject &&
-              subject.map((item) => {
-                return (
-                  <option value={item.name} key={item.name}>
-                    {item.name}
-                  </option>
-                );
-              })}
-          </select>
-          <button
-            onClick={getSubjectMaterial}
-            className="bg-blue-500 text-white py-3 px-4 text-2xl rounded-sm"
-          >
-            <HiOutlineSearch />
-          </button>
-        </div>
-        <div className="mt-8 w-full">
-          {material &&
-            material.reverse().map((item, index) => {
+    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10 bg-white shadow-lg rounded-lg p-10">
+    <Heading title="Material" />
+    <div className="mt-8 w-full flex justify-center items-center flex-col">
+      <div className="flex justify-center items-center w-[40%] space-x-4">
+        <select
+          value={selected}
+          name="subject"
+          id="subject"
+          onChange={onSelectChangeHandler}
+          className="px-4 py-3 bg-blue-50 border border-blue-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option defaultValue value="select">
+            -- Select Subject --
+          </option>
+          {subject &&
+            subject.map((item) => {
               return (
-                <div
-                  key={index}
-                  className="border-blue-500 border-2 w-full rounded-md shadow-sm py-4 px-6 relative mb-4"
-                >
-                  <p
-                    className={`text-xl font-medium flex justify-start items-center ${
-                      item.link && "cursor-pointer"
-                    } group`}
-                    onClick={() =>
-                      item.link &&
-                      window.open(
-                        process.env.REACT_APP_MEDIA_LINK + "/" + item.link
-                      )
-                    }
-                  >
-                    {item.title}{" "}
-                    {item.link && (
-                      <span className="text-2xl group-hover:text-blue-500 ml-1">
-                        <IoMdLink />
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-base font-normal mt-1">
-                    {item.subject} - {item.faculty}
-                  </p>
-                  <p className="text-sm absolute top-4 right-4 flex justify-center items-center">
-                    <span className="text-base mr-1">
-                      <HiOutlineCalendar />
-                    </span>{" "}
-                    {item.createdAt.split("T")[0].split("-")[2] +
-                      "/" +
-                      item.createdAt.split("T")[0].split("-")[1] +
-                      "/" +
-                      item.createdAt.split("T")[0].split("-")[0] +
-                      " " +
-                      item.createdAt.split("T")[1].split(".")[0]}
-                  </p>
-                </div>
+                <option value={item.name} key={item.name}>
+                  {item.name}
+                </option>
               );
             })}
-          {material && material.length === 0 && selected && (
-            <p className="text-center">No Material For {selected}!</p>
-          )}
-        </div>
+        </select>
+        <button
+          onClick={getSubjectMaterial}
+          className="bg-blue-600 text-white py-3 px-6 text-lg rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-200"
+        >
+          <HiOutlineSearch />
+        </button>
+      </div>
+  
+      <div className="mt-8 w-full">
+        {material &&
+          material.reverse().map((item, index) => {
+            return (
+              <div
+                key={index}
+                className="border border-blue-200 rounded-lg shadow-sm p-6 mb-6 bg-white transition-all duration-200 overflow-hidden hover:scale-105 hover:shadow-2xl transform"
+              >
+                <p
+                  className={`text-xl font-semibold text-blue-700 flex justify-start items-center cursor-pointer hover:text-blue-600 group`}
+                  onClick={() =>
+                    item.link &&
+                    window.open(
+                      process.env.REACT_APP_MEDIA_LINK + "/" + item.link
+                    )
+                  }
+                >
+                  {item.title}
+                  {item.link && (
+                    <span className="ml-2 text-2xl group-hover:text-blue-500">
+                      <IoMdLink />
+                    </span>
+                  )}
+                </p>
+                <p className="text-sm text-gray-600 mt-2">
+                  {item.subject} - {item.faculty}
+                </p>
+                <p className="text-xs text-gray-500 absolute top-4 right-4 flex items-center">
+                  <span className="mr-1">
+                    <HiOutlineCalendar />
+                  </span>
+                  {item.createdAt.split("T")[0].split("-")[2] +
+                    "/" +
+                    item.createdAt.split("T")[0].split("-")[1] +
+                    "/" +
+                    item.createdAt.split("T")[0].split("-")[0] +
+                    " " +
+                    item.createdAt.split("T")[1].split(".")[0]}
+                </p>
+              </div>
+            );
+          })}
+        {material && material.length === 0 && selected && (
+          <p className="text-center text-lg text-gray-600 mt-4">
+            No Material For {selected}!
+          </p>
+        )}
       </div>
     </div>
+  </div>  
+
+
   );
 };
 

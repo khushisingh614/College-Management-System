@@ -54,7 +54,7 @@ const Quiz = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white shadow-md p-6 rounded-2xl border border-purple-200">
+    <div className="max-w-2xl mx-auto bg-white shadow-md p-6 rounded-2xl border border-purple-200">
       <h2 className="text-2xl font-bold text-center text-purple-700 mb-6">Generate Quiz</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">

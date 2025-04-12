@@ -2,6 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { baseApiURL } from "../../baseUrl";
 import SubmitAssignment from "./SubmitAssignment";
+import {
+  openDB,
+  getSubmissionsFromDB,
+  deleteSubmissionFromDB,
+  syncSubmissionsToBackend,
+} from "../../utils/sync"; // Adjust the path accordingly
+
 import { use } from "react";
 
 const AssignmentDashboard = () => {
@@ -19,8 +26,11 @@ const AssignmentDashboard = () => {
   const [showGrades, setShowGrades] = useState(false);
   const [grades, setGrades] = useState(null);
 
+  const dbName = "AssignmentDB";
+  const storeName = "assignments";
+  
   // Inline IndexedDB setup
-  const openDB = () => {
+  /*const openDB = () => {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open("AssignmentDB", 1);
       request.onerror = () => reject("Error opening DB");
@@ -32,15 +42,18 @@ const AssignmentDashboard = () => {
         }
       };
     });
-  };
+  };*/
 
   const saveToDB = async (data, status) => {
     if (!data || data.length === 0) return;
-    const db = await openDB();
-    const tx = db.transaction("assignments", "readwrite");
+    const db = await openDB(dbName,storeName);
+    const tx = db.transaction(storeName, "readwrite");
     const store = tx.objectStore("assignments");
     data.forEach(item => store.put({ ...item, status }));
-    return tx.complete;
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject("Transaction failed");
+    });    
   };
 
   const getAllFromDB = async () => {
@@ -85,6 +98,22 @@ const AssignmentDashboard = () => {
   
     fetchAssignments();
   }, [studentId, branch, semester]);
+
+    // Listen for the online event to trigger syncing
+    useEffect(() => {
+      const handleOnline = () => {
+        console.log("Online, syncing submissions if any...");
+        syncSubmissionsToBackend();
+      };
+    
+      // Always check once on component mount
+      if (navigator.onLine) {
+        handleOnline();
+      }
+    
+      window.addEventListener("online", handleOnline);
+      return () => window.removeEventListener("online", handleOnline);
+    }, []);
   
 
     const getGrades = async () => {
@@ -181,12 +210,23 @@ const AssignmentDashboard = () => {
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center backdrop-blur-sm bg-black/40 z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-xl relative">
   
-            <h3 className="text-xl font-bold mb-2">{selectedAssignment.title}</h3>
-            <p className="text-gray-700 mb-2">{selectedAssignment.description}</p>
-            <p className="text-sm text-red-500 mb-4">
-              Deadline: {new Date(selectedAssignment.deadline).toLocaleString()}
+            <h3 className="text-xl font-bold mb-2">Title: {selectedAssignment.title}</h3>
+            <p className="text-l text-red-500 mb-4">
+              <b>Deadline:</b> {new Date(selectedAssignment.deadline).toLocaleString()}
             </p>
-  
+            <p className="text-gray-700 mt-2"><strong>Description:</strong> {selectedAssignment.description}</p>
+                     {selectedAssignment.filePath && (
+                         <div className="mt-4">
+                             <a 
+                                 href={`http://localhost:5000/media/${selectedAssignment.filePath}`} 
+                                 target="_blank" 
+                                 rel="noopener noreferrer" 
+                                 className="text-blue-600 underline"
+                             >
+                                 Download Assignment
+                             </a>
+                         </div>
+                     )}
             <div className="flex justify-between mt-6">
             <button
                 onClick={() => setSelectedAssignment(null)}

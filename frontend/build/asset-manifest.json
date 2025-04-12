@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "http://localhost:3000/static/css/main.f904aef6.css",
+    "main.js": "http://localhost:3000/static/js/main.36f53a93.js",
+    "static/media/notebook.png": "http://localhost:3000/static/media/notebook.9acdd096475a921fafe9.png",
+    "static/media/file.png": "http://localhost:3000/static/media/file.7bc9b0c47f0f305dc9d3.png",
+    "static/media/highlighter.png": "http://localhost:3000/static/media/highlighter.9da8ffd98ff7fc6e8904.png",
+    "static/media/chintan.png": "http://localhost:3000/static/media/chintan.a3388ca2638bb88500b1.png",
+    "static/media/bottle.png": "http://localhost:3000/static/media/bottle.da448c16579a1aaefe31.png",
+    "static/media/akriti.png": "http://localhost:3000/static/media/akriti.1dd0a3df2620cb789a17.png",
+    "static/media/pen.png": "http://localhost:3000/static/media/pen.69a228c52114c3af57f4.png",
+    "static/media/raag.png": "http://localhost:3000/static/media/raag.b9b42f834cf9b7dbd8b8.png",
+    "static/media/pads.png": "http://localhost:3000/static/media/pads.94aa71705b0bff5ff171.png",
+    "static/media/malang.png": "http://localhost:3000/static/media/malang.57cf8a06f05e000554a0.png",
+    "static/media/drishti.png": "http://localhost:3000/static/media/drishti.a66a50a5ef882aee5c05.png",
+    "static/media/convex.png": "http://localhost:3000/static/media/convex.7ab76a09cb1410a06ef1.png",
+    "service-worker.js": "http://localhost:3000/service-worker.js",
+    "static/media/Cinephilia.png": "http://localhost:3000/static/media/Cinephilia.31fa20d70012c4203dd7.png",
+    "static/media/acm.png": "http://localhost:3000/static/media/acm.2b8fc8d5e61b53ffaf1a.png",
+    "index.html": "http://localhost:3000/index.html",
+    "main.f904aef6.css.map": "http://localhost:3000/static/css/main.f904aef6.css.map",
+    "main.36f53a93.js.map": "http://localhost:3000/static/js/main.36f53a93.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f904aef6.css",
+    "static/js/main.36f53a93.js"
+  ]
+}

@@ -170,14 +170,10 @@ const dynamicColors = generateColors(subjectKeys.length);
 
   
   return (
-    <div className="w-full max-w-4xl mx-auto mt-10 bg-white p-4 rounded-md">
+    <div className="w-full max-w-4xl mt-4 bg-white p-4 rounded-md">
+      <div>
       <h2 className="text-2xl font-bold mb-6 text-center">Grade Analytics</h2>
-      {gradeData.length === 0 ? (
-        <p className="text-center text-gray-500">No grade data available.</p>
-      ) : (
-        <Line data={data} options={options} />
-      )}
-  <div className="flex flex-col items-center gap-8 p-6 mt-8">
+       <div className="flex flex items-center gap-8 p-6 mt-8">
   <div className="flex flex-col md:flex-row justify-center items-center gap-10">
     <div className="w-72">
       <h3 className="text-lg font-bold mb-2 text-center">Internal Marks</h3>
@@ -202,9 +198,19 @@ const dynamicColors = generateColors(subjectKeys.length);
     ))}
   </div>
 </div>
+      
+        {gradeData.length === 0 ? (
+          <p className="text-center text-gray-500">No grade data available.</p>
+        ) : (
+          <div className="mt-6">
+            <h3 className="text-xl font-bold mb-2 text-center mt-6 mb-4">Assignment Marks over Time</h3>
+            <Line data={data} options={options} />
+          </div>
+        )}
 
+      </div>
 
-    </div>
+</div>
   );
 };
 
