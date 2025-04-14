@@ -16,15 +16,18 @@ const Marks = () => {
     subject: "",
     examType: "",
   });
+
   const loadStudentDetails = () => {
-    const headers = {
-      "Content-Type": "application/json",
-    };
+    const headers = { "Content-Type": "application/json" };
     axios
       .post(
         `${baseApiURL()}/student/details/getDetailsofmarks`,
-        { branch: selected.branch, semester: selected.semester, subject: selected.subject,
-          examType: selected.examType, },
+        {
+          branch: selected.branch,
+          semester: selected.semester,
+          subject: selected.subject,
+          examType: selected.examType,
+        },
         { headers }
       )
       .then((response) => {
@@ -49,16 +52,14 @@ const Marks = () => {
     const examType = selected.examType;
     const subject = selected.subject;
 
-    // Construct rows for Excel
     const data = studentData.map((student) => ({
       EnrollmentNo: student.enrollmentNo,
-      Name: student.firstName + " " + student.lastName || "-", // If you have name in student object
+      Name: student.firstName + " " + student.lastName || "-",
       [subject + " - " + examType]: student.existingMarks ?? "Not Available",
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-
     XLSX.utils.book_append_sheet(workbook, worksheet, "Marks");
 
     const filename = `${selected.branch}_Sem${selected.semester}_${subject}_${examType}_Marks.xlsx`;
@@ -76,9 +77,7 @@ const Marks = () => {
   };
 
   const setStudentMarksHandler = (enrollment, value) => {
-    const headers = {
-      "Content-Type": "application/json",
-    };
+    const headers = { "Content-Type": "application/json" };
     axios
       .post(
         `${baseApiURL()}/marks/addMarks`,
@@ -91,11 +90,10 @@ const Marks = () => {
         { headers }
       )
       .then((response) => {
+        toast.dismiss();
         if (response.data.success) {
-          toast.dismiss();
           toast.success(response.data.message);
         } else {
-          toast.dismiss();
           toast.error(response.data.message);
         }
       })
@@ -106,9 +104,7 @@ const Marks = () => {
   };
 
   const getBranchData = () => {
-    const headers = {
-      "Content-Type": "application/json",
-    };
+    const headers = { "Content-Type": "application/json" };
     axios
       .get(`${baseApiURL()}/branch/getBranch`, { headers })
       .then((response) => {
@@ -129,7 +125,7 @@ const Marks = () => {
     toast.loading("Loading Subjects");
     axios
       .get(`${baseApiURL()}/subject/getSubjectbranchandsem`, {
-        params: { offering_branch: selected.branch, semester: selected.semester }, 
+        params: { offering_branch: selected.branch, semester: selected.semester },
       })
       .then((response) => {
         toast.dismiss();
@@ -147,176 +143,179 @@ const Marks = () => {
 
   useEffect(() => {
     getBranchData();
-  }, []);  // Fetch branches only once on mount
-  
+  }, []);
+
   useEffect(() => {
     if (selected.branch && selected.semester) {
       getSubjectData(selected.branch, selected.semester);
     }
-  }, [selected.branch, selected.semester]); // Run whenever branch or semester changes
+  }, [selected.branch, selected.semester]);
 
   const resetValueHandler = () => {
     setStudentData();
   };
 
   return (
-    <div className="w-full mx-auto flex justify-center items-start flex-col my-10">
-  <div className="relative flex justify-between items-center w-full">
-    <Heading title={`Upload Marks`} />
-    {studentData && (
-      <button
-        className="absolute right-2 flex justify-center items-center border-2 border-red-500 px-3 py-2 rounded text-red-500"
-        onClick={resetValueHandler}
-      >
-        <span className="mr-2">
-          <BiArrowBack className="text-red-500" />
-        </span>
-        Close
-      </button>
-    )}
-  </div>
-
-  {!studentData && (
-    <>
-      <div className="mt-10 w-full flex justify-evenly items-center gap-x-6">
-        <div className="w-full">
-          <label htmlFor="branch" className="leading-7 text-base text-indigo-700">
-            Select Branch
-          </label>
-          <select
-            id="branch"
-            className="px-2 bg-indigo-200 py-3 rounded-sm text-base w-full accent-indigo-700 mt-1"
-            value={selected.branch}
-            onChange={(e) =>
-              setSelected({ ...selected, branch: e.target.value })
-            }
+    <div className="w-full max-w-7xl mx-auto px-4 py-10 bg-white">
+      <div className="relative flex justify-between items-center w-full mb-6">
+        <Heading title={`Upload Marks`} />
+        {studentData && (
+          <button
+            className="absolute right-2 flex items-center border border-red-500 px-4 py-2 rounded-md text-red-600 hover:bg-red-50 transition"
+            onClick={resetValueHandler}
           >
-            <option defaultValue>-- Select --</option>
-            {branch &&
-              branch.map((branch) => (
-                <option value={branch.name} key={branch.name}>
-                  {branch.name}
-                </option>
-              ))}
-          </select>
-        </div>
-
-        <div className="w-full">
-          <label htmlFor="semester" className="leading-7 text-base text-indigo-700">
-            Select Semester
-          </label>
-          <select
-            id="semester"
-            className="px-2 bg-indigo-200 py-3 rounded-sm text-base w-full accent-indigo-700 mt-1"
-            value={selected.semester}
-            onChange={(e) =>
-              setSelected({ ...selected, semester: e.target.value })
-            }
-          >
-            <option defaultValue>-- Select --</option>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
-              <option key={sem} value={sem}>
-                {sem} {sem === 1 ? "st" : sem === 2 ? "nd" : sem === 3 ? "rd" : "th"} Semester
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="w-full">
-          <label htmlFor="subject" className="leading-7 text-base text-indigo-700">
-            Select Subject
-          </label>
-          <select
-            id="subject"
-            className="px-2 bg-indigo-200 py-3 rounded-sm text-base w-full accent-indigo-700 mt-1"
-            value={selected.subject}
-            onChange={(e) =>
-              setSelected({ ...selected, subject: e.target.value })
-            }
-          >
-            <option defaultValue>-- Select --</option>
-            {subject &&
-              subject.map((subject) => (
-                <option value={subject.name} key={subject.name}>
-                  {subject.name}
-                </option>
-              ))}
-          </select>
-        </div>
-
-        <div className="w-full">
-          <label htmlFor="examType" className="leading-7 text-base text-indigo-700">
-            Select Exam Type
-          </label>
-          <select
-            id="examType"
-            className="px-2 bg-indigo-200 py-3 rounded-sm text-base w-full accent-indigo-700 mt-1"
-            value={selected.examType}
-            onChange={(e) =>
-              setSelected({ ...selected, examType: e.target.value })
-            }
-          >
-            <option defaultValue>-- Select --</option>
-            <option value="internal">Internal</option>
-            <option value="external">External</option>
-          </select>
-        </div>
+            <BiArrowBack className="mr-2" />
+            Close
+          </button>
+        )}
       </div>
 
-      <button
-        className="bg-indigo-200 px-4 py-2 mt-8 mx-auto rounded border-2 border-indigo-500 text-black"
-        onClick={loadStudentDetails}
-      >
-        Load Student Data
-      </button>
-    </>
-  )}
+      {!studentData && (
+        <>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div>
+              <label htmlFor="branch" className="block mb-1 font-medium">
+                Select Branch
+              </label>
+              <select
+                id="branch"
+                className="w-full px-3 py-2 border rounded-md"
+                value={selected.branch}
+                onChange={(e) =>
+                  setSelected({ ...selected, branch: e.target.value })
+                }
+              >
+                <option value="">-- Select --</option>
+                {branch &&
+                  branch.map((b) => (
+                    <option value={b.name} key={b.name}>
+                      {b.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
 
-  {studentData && studentData.length !== 0 && (
-    <>
-      <p className="mt-4 text-lg text-indigo-700">
-        Upload {selected.examType} Marks Of {selected.branch} Semester{" "}
-        {selected.semester} of {selected.subject}
-      </p>
+            <div>
+              <label htmlFor="semester" className="block mb-1 font-medium">
+                Select Semester
+              </label>
+              <select
+                id="semester"
+                className="w-full px-3 py-2 border rounded-md"
+                value={selected.semester}
+                onChange={(e) =>
+                  setSelected({ ...selected, semester: e.target.value })
+                }
+              >
+                <option value="">-- Select --</option>
+                {[...Array(8)].map((_, i) => (
+                  <option value={i + 1} key={i}>
+                    {i + 1} Semester
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      <div
-        className="w-full flex flex-wrap justify-center items-center mt-8 gap-4"
-        id="markContainer"
-      >
-        {studentData.map((student) => (
-          <div
-            key={student.enrollmentNo}
-            className="w-[30%] flex justify-between items-center border-2 border-indigo-500 rounded"
-            id={student.enrollmentNo}
-          >
-            <p className="text-lg px-4 w-1/2 bg-indigo-50 text-indigo-700">
-              {student.enrollmentNo}
-            </p>
-            <input
-              type="number"
-              className="px-6 py-2 focus:ring-0 outline-none w-1/2 bg-indigo-200 border-2 border-indigo-300 rounded"
-              placeholder="Enter Marks"
-              id={`${student.enrollmentNo}marks`}
-            />
+            <div>
+              <label htmlFor="subject" className="block mb-1 font-medium">
+                Select Subject
+              </label>
+              <select
+                id="subject"
+                className="w-full px-3 py-2 border rounded-md"
+                value={selected.subject}
+                onChange={(e) =>
+                  setSelected({ ...selected, subject: e.target.value })
+                }
+              >
+                <option value="">-- Select --</option>
+                {subject &&
+                  subject.map((s) => (
+                    <option value={s.name} key={s.name}>
+                      {s.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="examType" className="block mb-1 font-medium">
+                Select Exam Type
+              </label>
+              <select
+                id="examType"
+                className="w-full px-3 py-2 border rounded-md"
+                value={selected.examType}
+                onChange={(e) =>
+                  setSelected({ ...selected, examType: e.target.value })
+                }
+              >
+                <option value="">-- Select --</option>
+                <option value="internal">Internal</option>
+                <option value="external">External</option>
+              </select>
+            </div>
           </div>
-        ))}
-      </div>
 
-      <button
-        className="bg-indigo-500 hover:bg-indigo-600 px-6 py-3 mt-8 mx-auto rounded text-white"
-        onClick={submitMarksHandler}
-      >
-        Upload Student Marks
-      </button>
-      <button
-        className="bg-indigo-500 hover:bg-indigo-600 px-6 py-3 mt-4 mx-auto rounded text-white"
-        onClick={downloadExcelHandler}
-      >
-        Download Excel
-      </button>
-    </>
-  )}
-</div>
+          <button
+            className="bg-blue-600 text-white px-6 py-2 mt-8 rounded hover:bg-blue-700 transition"
+            onClick={loadStudentDetails}
+          >
+            Load Student Data
+          </button>
+        </>
+      )}
+
+      {studentData && studentData.length > 0 && (
+        <>
+          <p className="mt-6 text-xl font-semibold">
+            Upload {selected.examType} Marks of {selected.branch} - Sem{" "}
+            {selected.semester} ({selected.subject})
+          </p>
+
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6"
+            id="markContainer"
+          >
+            {studentData.map((student) => (
+              <div
+                key={student.enrollmentNo}
+                id={student.enrollmentNo}
+                className="flex justify-between items-center border border-blue-300 rounded-md p-3 shadow-sm bg-white"
+              >
+                <span className="text-sm font-medium w-1/2 truncate">
+                  {student.enrollmentNo}
+                </span>
+                <input
+                  type="number"
+                  id={`${student.enrollmentNo}marks`}
+                  placeholder="Enter Marks"
+                  defaultValue={
+                    student.existingMarks !== null ? student.existingMarks : ""
+                  }
+                  className="w-1/2 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 mt-8">
+            <button
+              className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
+              onClick={submitMarksHandler}
+            >
+              Upload Student Marks
+            </button>
+            <button
+              className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition"
+              onClick={downloadExcelHandler}
+            >
+              Download Excel
+            </button>
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 

@@ -58,7 +58,14 @@ const Home = () => {
   return (
     <section>
       {load && (
-        <div className="flex bg-[#E8F9FF] min-h-screen flex-col overflow-visible">
+        <div className="flex bg-[#E8F9FF] min-h-screen flex-col overflow-visible" 
+        // style={{
+        //   backgroundImage: 'url(/5.png)', 
+        //   backgroundSize: 'cover', 
+        //   backgroundPosition: 'center',
+        //   backgroundAttachment: 'fixed',
+        // }} 
+        >
           <Navbar />
           <div className="flex flex-1 overflow-visible">
             <Sidebar>

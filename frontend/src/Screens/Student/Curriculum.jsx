@@ -7,9 +7,9 @@ import { IoMdLink } from "react-icons/io";
 import { HiOutlineCalendar, HiOutlineSearch } from "react-icons/hi";
 
 const Curriculum = () => {
-  const [subject, setSubject] = useState();
-  const [selected, setSelected] = useState();
-  const [curriculum, setCurriculum] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [curriculums, setCurriculums] = useState([]);
 
   useEffect(() => {
     toast.loading("Loading Subjects...");
@@ -18,127 +18,120 @@ const Curriculum = () => {
       .then((response) => {
         toast.dismiss();
         if (response.data.success) {
-          setSubject(response.data.subject);
+          setSubjects(response.data.subject);
         } else {
           toast.error(response.data.message);
         }
       })
       .catch((error) => {
         toast.dismiss();
-        toast.error(error.message);
+        toast.error("Failed to load subjects");
+        console.error(error);
       });
   }, []);
 
-  const getSubjectCurriculum = () => {
-    const headers = {
-      "Content-Type": "application/json",
-    };
+  const fetchCurriculum = () => {
     axios
       .post(
         `${baseApiURL()}/curriculum/getCurriculum`,
-        { subject: selected },
-        { headers }
+        { subject: selectedSubject },
+        { headers: { "Content-Type": "application/json" } }
       )
       .then((response) => {
         if (response.data.success) {
-          setCurriculum(response.data.curriculum);
-        } else {
-          // Error
+          setCurriculums(response.data.curriculum);
         }
       })
       .catch((error) => {
-        console.error(error);
+        console.error("Error fetching curriculum:", error);
       });
   };
 
-  const onSelectChangeHandler = (e) => {
-    setCurriculum();
-    setSelected(e.target.value);
+  const handleSubjectChange = (e) => {
+    setSelectedSubject(e.target.value);
+    setCurriculums([]);
+  };
+
+  const formatDateTime = (dateString) => {
+    const [date, time] = dateString.split("T");
+    const [year, month, day] = date.split("-");
+    const formattedTime = time.split(".")[0];
+    return `${day}/${month}/${year} ${formattedTime}`;
   };
 
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10 bg-white shadow-lg rounded-lg p-8">
-  <Heading title="Curriculum" />
-  <div className="mt-8 w-full flex justify-center items-center flex-col">
-    <div className="flex justify-center items-center w-[40%] space-x-4">
-      <select
-        value={selected}
-        name="subject"
-        id="subject"
-        onChange={onSelectChangeHandler}
-        className="px-4 py-3 bg-blue-50 border border-blue-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <option defaultValue value="select">
-          -- Select Subject --
-        </option>
-        {subject &&
-          subject.map((item) => {
-            return (
-              <option value={item.name} key={item.name}>
-                {item.name}
-              </option>
-            );
-          })}
-      </select>
-      <button
-        onClick={getSubjectCurriculum}
-        className="bg-blue-600 text-white py-3 px-6 text-lg rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-200"
-      >
-        <HiOutlineSearch />
-      </button>
-    </div>
+    <div className="w-full flex justify-center px-4 py-10 min-h-[80vh] bg-gradient-to-r from-blue-50 to-white">
+      <div className="w-full max-w-5xl bg-white rounded-xl shadow-2xl p-10 flex flex-col">
 
-    <div className="mt-8 w-full">
-      {curriculum &&
-        curriculum.reverse().map((item, index) => {
-          return (
-            <div
-              key={index}
-              className="border border-blue-200 rounded-lg shadow-lg p-6 mb-6 transition-all hover:scale-105 hover:shadow-2xl transform duration-200"
+        <Heading title="Curriculum" className="text-4xl font-semibold text-blue-600" />
+
+        <div className="mt-10 flex flex-col items-center space-y-8">
+          <div className="flex w-full sm:w-3/5 gap-4">
+            <select
+              value={selectedSubject}
+              onChange={handleSubjectChange}
+              className="flex-1 px-4 py-3 bg-blue-50 rounded-lg border border-blue-200 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <p
-                className={`text-xl font-semibold text-blue-700 flex justify-start items-center cursor-pointer hover:text-blue-600 group`}
-                onClick={() =>
-                  item.link &&
-                  window.open(
-                    process.env.REACT_APP_MEDIA_LINK + "/" + item.link
-                  )
-                }
-              >
-                {item.title}
-                {item.link && (
-                  <span className="ml-2 text-2xl group-hover:text-blue-500">
-                    <IoMdLink />
-                  </span>
-                )}
-              </p>
-              <p className="text-sm text-gray-600 mt-2">
-                {item.subject} - {item.faculty}
-              </p>
-              <p className="text-xs text-gray-500 absolute top-4 right-4 flex items-center">
-                <span className="mr-1">
-                  <HiOutlineCalendar />
-                </span>
-                {item.createdAt.split("T")[0].split("-")[2] +
-                  "/" +
-                  item.createdAt.split("T")[0].split("-")[1] +
-                  "/" +
-                  item.createdAt.split("T")[0].split("-")[0] +
-                  " " +
-                  item.createdAt.split("T")[1].split(".")[0]}
-              </p>
-            </div>
-          );
-        })}
-      {curriculum && curriculum.length === 0 && selected && (
-        <p className="text-center text-lg text-gray-600 mt-4">
-          No Curriculum For {selected}!
-        </p>
-      )}
-    </div>
-  </div>
-</div>
+              <option value="">-- Select Subject --</option>
+              {subjects.map((item) => (
+                <option value={item.name} key={item.name}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={fetchCurriculum}
+              className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg text-xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-all"
+            >
+              <HiOutlineSearch />
+            </button>
+          </div>
 
+          <div className="w-full">
+            {curriculums.length > 0 ? (
+              curriculums
+                .slice()
+                .reverse()
+                .map((item, index) => (
+                  <div
+                    key={index}
+                    className="border-2 border-blue-500 rounded-lg shadow-md p-6 mb-6 bg-gradient-to-r from-blue-50 via-white to-blue-50 hover:scale-105 transition-transform relative"
+                  >
+                    <p
+                      className={`text-xl font-semibold flex items-center gap-2 ${item.link ? "cursor-pointer group" : ""}`}
+                      onClick={() =>
+                        item.link &&
+                        window.open(
+                          process.env.REACT_APP_MEDIA_LINK + "/" + item.link
+                        )
+                      }
+                    >
+                      {item.title}
+                      {item.link && (
+                        <IoMdLink className="text-2xl group-hover:text-blue-600 transition-colors" />
+                      )}
+                    </p>
+                    <p className="text-base text-gray-700 mt-2">
+                      {item.subject} — {item.faculty}
+                    </p>
+                    <p className="text-sm text-gray-500 absolute top-4 right-5 flex items-center">
+                      <HiOutlineCalendar className="mr-1" />
+                      {formatDateTime(item.createdAt)}
+                    </p>
+                  </div>
+                ))
+            ) : (
+              selectedSubject && (
+                <p className="text-center text-lg text-gray-600 mt-8">
+                  No curriculum available for{" "}
+                  <span className="font-semibold">{selectedSubject}</span>.
+                </p>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

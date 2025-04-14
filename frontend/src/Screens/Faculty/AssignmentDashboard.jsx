@@ -2,6 +2,7 @@
  import axios from "axios";
  import { baseApiURL } from "../../baseUrl";
  import UploadAssignment from "./UploadAssignment";
+ import Heading from "../../components/Heading";
  
  export default function Dashboard() {
      const [assignments, setAssignments] = useState([]);
@@ -74,7 +75,8 @@
         <UploadAssignment />
     ) : (
         <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg flex flex-col">
-            <h2 className="text-3xl font-bold mb-6 text-center">Uploaded Assignments</h2>
+            <Heading title="Uploaded Assignments"  />
+            <br />
     
             {/* Assignment List */}
             {assignments.length === 0 ? (

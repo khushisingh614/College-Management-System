@@ -170,7 +170,7 @@ const Notice = (prop) => {
   };
 
   return (
-    <div className="w-full mx-auto flex justify-center items-start flex-col my-10">
+    <div className="w-full mx-auto flex justify-center items-start flex-col my-10 bg-white p-6 rounded-xl shadow-md">
   <div className="relative flex justify-between items-center w-full">
     <Heading title="Notices" />
     {open ? (

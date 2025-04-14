@@ -6,11 +6,12 @@ const FacultyAssignment = require("../../models/Other/facultyAssignments.model")
 
 const getGrade = async (req, res) => {
      try {
-        //console.log(req.body)
+         console.log(req.body)
          const { studentId } = req.body;
-         //console.log(req.body)
+         console.log(req.body)
          if(!studentId) return res.json("null value");
          const submissions = await Grade.find({studentId});
+         
          //console.log(submissions)
          if (submissions.length === 0) return res.json("Grades not available yet!");
 
@@ -33,7 +34,7 @@ const getGrade = async (req, res) => {
      
          // Filter out any nulls (failed lookups)
          const cleanedData = gradeData.filter((entry) => entry !== null);
-         //console.log(cleanedData);
+         console.log(cleanedData);
          return res.json(cleanedData);
      } catch (error) {
          res.status(500).json({ message: "Error fetching submissions", error });
@@ -44,10 +45,11 @@ const getGrade = async (req, res) => {
 const getMarksDistribution = async (req, res) => {
   try {
     const { enrollmentNo } = req.body;
+    //console.log(enrollmentNo);
     if (!enrollmentNo) return res.status(400).json({ message: "Student ID is required" });
 
     const latestEntry = await Marks.findOne({ enrollmentNo }).sort({ updatedAt: -1 }); // get latest update
-
+    //console.log(latestEntry);
     if (!latestEntry) return res.status(405).json({ message: "No marks found" });
 
     res.json({

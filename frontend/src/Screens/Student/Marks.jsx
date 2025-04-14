@@ -35,57 +35,58 @@ const Marks = () => {
   }, [userData.enrollmentNo]);
 
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10 bg-white shadow-lg rounded-lg p-8">
-    <Heading title={`Marks of Semester ${userData.semester}`} />
-    <div className="mt-14 w-full flex gap-10">
-      {internal && (
-        <div className="w-1/2 shadow-lg p-6 bg-green-100 rounded-lg border border-gray-200">
-          <p className="border-b-2 border-red-500 text-2xl font-semibold pb-3">
-            Internal Marks (Out of 20)
-          </p>
-          <div className="mt-5">
-            {Object.keys(internal).map((item, index) => {
-              return (
-                <div
-                  key={index}
-                  className="flex justify-between items-center w-full text-lg mt-4"
-                >
-                  <p className="w-full text-gray-700">{item}</p>
-                  <span className="font-medium text-blue-600">{internal[item]}</span>
+    <div className="w-full max-w-5xl mx-auto mt-12 mb-16 px-4 sm:px-8">
+      <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8 border border-gray-200">
+        <Heading title={`Semester ${userData.semester} Marks`} />
+
+        {(internal || external) ? (
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+            {internal && (
+              <div className="bg-gray-50 border border-gray-200 shadow-md rounded-xl p-6">
+                <h2 className="text-xl font-semibold border-b border-red-400 pb-2 text-gray-700">
+                  Internal Marks (Out of 20)
+                </h2>
+                <div className="mt-5 space-y-3">
+                  {Object.keys(internal).map((subject, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center text-gray-600 text-base border-b py-1"
+                    >
+                      <p>{subject}</p>
+                      <span className="font-medium">{internal[subject]}</span>
+                    </div>
+                  ))}
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-      {external && (
-        <div className="w-1/2 shadow-lg p-6 bg-green-100 rounded-lg border border-gray-200">
-          <p className="border-b-2 border-red-500 text-2xl font-semibold pb-3">
-            External Marks (Out of 80)
-          </p>
-          <div className="mt-5">
-            {Object.keys(external).map((item, index) => {
-              return (
-                <div
-                  key={index}
-                  className="flex justify-between items-center w-full text-lg mt-4"
-                >
-                  <p className="w-full text-gray-700">{item}</p>
-                  <span className="font-medium text-blue-600">{external[item]}</span>
+              </div>
+            )}
+
+            {external && (
+              <div className="bg-gray-50 border border-gray-200 shadow-md rounded-xl p-6">
+                <h2 className="text-xl font-semibold border-b border-red-400 pb-2 text-gray-700">
+                  External Marks (Out of 80)
+                </h2>
+                <div className="mt-5 space-y-3">
+                  {Object.keys(external).map((subject, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center text-gray-600 text-base border-b py-1"
+                    >
+                      <p>{subject}</p>
+                      <span className="font-medium">{external[subject]}</span>
+                    </div>
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            )}
           </div>
-        </div>
-      )}
-      {!internal && !external && (
-        <p className="mt-6 text-center text-lg text-gray-600">
-          No Marks Available At The Moment!
-        </p>
-      )}
+        ) : (
+          <p className="text-center text-gray-500 text-lg mt-16">
+            No Marks Available At The Moment!
+          </p>
+        )}
+      </div>
     </div>
-  </div>
-  );  
+  );
 };
 
 export default Marks;

@@ -96,10 +96,11 @@ const getSubjectForums = async (req, res) => {
 
 const getProfForums = async (req, res) => {
     const { facId } = req.params;
-  
+    console.log(facId)
     try {
       // Step 1: Find faculty by employeeId
       const faculty = await FacultyDetail.findOne({ employeeId: facId });
+      console.log(faculty);
       if (!faculty) return res.status(404).json({ message: "Faculty not found" });
         //console.log(faculty._id);
       // Step 2: Find all subjects taught by this faculty

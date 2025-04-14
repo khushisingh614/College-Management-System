@@ -1,0 +1,90 @@
+[{
+  "_id": {
+    "$oid": "67f6db6bcb35815937832843"
+  },
+  "studentId": 39,
+  "assignmentId": {
+    "$oid": "67f3912ea5a958274b1aa729"
+  },
+  "grade": 23,
+  "feedback": "good",
+  "gradedAt": {
+    "$date": "2025-04-09T20:41:15.580Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f6fd966359a7a6e61ef9df"
+  },
+  "studentId": 39,
+  "assignmentId": {
+    "$oid": "67f3912ea5a958274b1aa729"
+  },
+  "grade": 15,
+  "feedback": "good",
+  "gradedAt": {
+    "$date": "2025-04-09T22:41:15.580Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f6fda06359a7a6e61ef9e0"
+  },
+  "studentId": 39,
+  "assignmentId": {
+    "$oid": "67f3912ea5a958274b1aa729"
+  },
+  "grade": 30,
+  "feedback": "good",
+  "gradedAt": {
+    "$date": "2025-04-09T21:41:15.580Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f6fda96359a7a6e61ef9e1"
+  },
+  "studentId": 39,
+  "assignmentId": {
+    "$oid": "67f3912ea5a958274b1aa729"
+  },
+  "grade": 20,
+  "feedback": "good",
+  "gradedAt": {
+    "$date": "2025-04-10T20:41:15.580Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f6fdb36359a7a6e61ef9e2"
+  },
+  "studentId": 39,
+  "assignmentId": {
+    "$oid": "67f3912ea5a958274b1aa729"
+  },
+  "grade": 27,
+  "feedback": "good",
+  "gradedAt": {
+    "$date": "2025-04-10T22:41:15.580Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67fc8275fcea02b5951bb1a2"
+  },
+  "studentId": 39,
+  "assignmentId": {
+    "$oid": "67fc8229fcea02b5951bb176"
+  },
+  "grade": 30,
+  "feedback": "good, but late",
+  "gradedAt": {
+    "$date": "2025-04-14T03:35:17.313Z"
+  },
+  "__v": 0
+}]

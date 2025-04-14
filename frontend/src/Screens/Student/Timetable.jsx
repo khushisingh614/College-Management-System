@@ -5,6 +5,7 @@ import Heading from "../../components/Heading";
 import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import { baseApiURL } from "../../baseUrl";
+
 const Timetable = () => {
   const [timetable, setTimetable] = useState("");
   const userData = useSelector((state) => state.userData);
@@ -17,8 +18,11 @@ const Timetable = () => {
       axios
         .get(
           `${baseApiURL()}/timetable/getTimetable`,
-          { semester: userData.semester, branch: userData.branch },
           {
+            params: {
+              semester: userData.semester,
+              branch: userData.branch,
+            },
             headers: headers,
           }
         )
@@ -36,39 +40,40 @@ const Timetable = () => {
   }, [userData, userData.branch, userData.semester]);
 
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10 space-y-6 bg-gray-50 p-6 rounded-lg shadow-lg">
-  <div className="flex justify-between items-center w-full mb-6 p-4 rounded-md">
-    <Heading title={`Timetable of Semester ${userData.semester}`} />
-    {timetable && (
-      <p
-        className="flex justify-center items-center text-lg font-semibold text-blue-600 cursor-pointer hover:text-red-500 hover:scale-110 ease-linear transition-all duration-200"
-        onClick={() =>
-          window.open(process.env.REACT_APP_MEDIA_LINK + "/" + timetable)
-        }
-      > 
-        <button className="flex items-center justify-center px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 hover:scale-105 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-  <span>Download</span>
-  <span className="ml-2">
-    <FiDownload />
-  </span>
-</button>
+    <div className="w-full max-w-5xl mx-auto mt-12 mb-16 px-4 sm:px-8">
+      <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8 border border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <Heading title={`Semester ${userData.semester} Timetable`} />
+          {timetable && (
+            <button
+              onClick={() =>
+                window.open(
+                  process.env.REACT_APP_MEDIA_LINK + "/" + timetable
+                )
+              }
+              className="inline-flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition-transform duration-200 hover:scale-105"
+            >
+              <FiDownload className="text-lg" />
+              Download
+            </button>
+          )}
+        </div>
 
-      </p>
-    )}
-  </div>
-  
-  {timetable ? (
-    <img
-      className="mt-8 rounded-lg shadow-lg w-[80%] mx-auto transition-all transform hover:scale-105"
-      src={process.env.REACT_APP_MEDIA_LINK + "/" + timetable}
-      alt="Timetable"
-    />
-  ) : (
-    <p className="text-lg text-gray-500 mt-10">No Timetable Available At The Moment!</p>
-  )}
-</div>
-
-
+        <div className="mt-8 flex justify-center">
+          {timetable ? (
+            <img
+              className="rounded-xl shadow-md w-full sm:w-3/4 border border-gray-300"
+              src={process.env.REACT_APP_MEDIA_LINK + "/" + timetable}
+              alt="Timetable"
+            />
+          ) : (
+            <p className="text-center text-gray-500 text-lg mt-12">
+              No Timetable Available At The Moment!
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

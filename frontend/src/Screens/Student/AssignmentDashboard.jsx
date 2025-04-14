@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { baseApiURL } from "../../baseUrl";
 import SubmitAssignment from "./SubmitAssignment";
+import Heading from "../../components/Heading";
 import {
   openDB,
   getSubmissionsFromDB,
@@ -57,8 +58,8 @@ const AssignmentDashboard = () => {
   };
 
   const getAllFromDB = async () => {
-    const db = await openDB();
-    const tx = db.transaction("assignments", "readonly");
+    const db = await openDB(dbName,storeName);
+    const tx = db.transaction(storeName, "readonly");
     const store = tx.objectStore("assignments");
     return new Promise((resolve, reject) => {
       const req = store.getAll();
@@ -170,7 +171,8 @@ const AssignmentDashboard = () => {
 
   return (
     <div className="p-6 bg-white rounded-md">
-      <h2 className="text-2xl font-bold mb-6 ">Assignments</h2>
+      <Heading title="Assignments"  />
+      <br />
   
       {/* Sections */}
       <div className="space-y-10 ">

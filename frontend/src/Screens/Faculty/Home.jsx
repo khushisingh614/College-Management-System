@@ -68,7 +68,7 @@ const Home = () => {
   return (
     <section>
       {load && (
-        <div className="flex bg-[#E8F9FF] min-h-screen flex flex-col overflow-visible">
+        <div className="flex bg-[#E8F9FF] min-h-screen flex flex-col overflow-visible" >
           
 
           <Navbar />

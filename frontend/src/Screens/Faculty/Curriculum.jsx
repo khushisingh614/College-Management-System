@@ -84,7 +84,7 @@ const CurriculumUpload = () => {
   };
 
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10">
+    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10 bg-white py-10 px-4">
   <div className="flex justify-between items-center w-full ">
     <Heading title="Upload Curriculum" />
   </div>
