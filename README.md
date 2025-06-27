@@ -1,5 +1,5 @@
 
-# 🎓 CollegeMania – An All-in-One College Management System
+# 🎓 CollegeMania – College Management System
 
 Built for the <b>WiSE Hackathon'25 finale</b> by Texas Instruments.
 CollegeMania is a full-stack MERN-based academic management platform that bridges students, faculty, and administrators under a single intelligent interface. It offers AI-based assessments, offline support, real-time updates, and role-based functionality — all built for scalability and seamless campus digitization.
