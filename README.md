@@ -39,22 +39,19 @@ CollegeMania is a full-stack MERN-based academic management platform that bridge
 2. **Timetable** – Real-time schedule visibility for lectures, labs, and other sessions.
 3. **Notice Board** – Publish and view academic/admin announcements instantly.
 4. **Material Upload & Access** – Faculty upload study content; students download by subject or semester.
-5. **Temporary Access Control** – Escalate roles (e.g., peer mentor) with time-bound access and full audit logging.
+5. **Temporary Access Control** – Escalate roles (e.g., peer mentor/TA) with time-bound access.
 6. **Student Info Viewer** – Access student lists, attendance logs, and performance details.
-7. **Upload Marks** – Faculty post internal marks directly into the database.
+7. **Upload Marks** – Faculty post internal and external marks directly into the database.
 8. **Curriculum Manager** – Edit/view structured syllabus and credit breakdowns.
 9. **Assignment Manager** – Issue assignments with deadlines, submission portals, and evaluation tools. Offline-ready.
 10. **Attendance Tracker** – Record and review attendance with subject-wise breakdowns.
 11. **Quiz Portal** – Upload material → generate quizzes → evaluate results (with AI grading).
-12. **Discussion Forums** – Post questions, respond in threads, tag faculty or subjects.
+12. **Discussion Forums** – Post questions, respond in threads, tag faculty or subjects, pin important announcements.
 13. **Role-Based Dashboards** – UI changes dynamically based on user type (Student, Faculty, Admin).
 14. **2-Factor Authentication (2FA)** – OTP via email during login for secure access.
-15. **Offline Access** – Complete and store assignments offline; auto-sync when online.
-16. **Live WebSocket Notifications** – Instant push for quizzes, updates, or new results.
-17. **Feedback & Complaint Module** – Secure channel for raising academic/admin issues.
-18. **Health & Emergency Module** – Book appointments, access prescriptions, and call emergency helplines.
-19. **Career & Skill Development Portal** – View workshops, webinars, and register for upskilling events.
-20. **Gamified Dashboard** – Ranks, points, and badges based on task completion.
+15. **Offline Access** – Complete and submit assignments offline; auto-sync when online.
+16. **Feedback & Complaint Module** – Secure channel for raising academic/admin issues.
+27. **Gamified Dashboard** – Ranks, points, and badges based on task completion.
 
 ---
 
